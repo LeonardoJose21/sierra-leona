@@ -128,7 +128,7 @@ const COPY = {
       kicker: "Galería",
       title: "Así se vive Sierra Campestre",
       // DUMMY captions — adjust to match your real photos
-      items: ["Piscina principal", "Zonas verdes y sombra", "Animalitos", "La parrilla", "Tirolesa", "Atardecer", "Piscina", "Área de relajación"],
+      items: ["Zona central", "Zonas verdes y sombra", "Animalitos", "La parrilla", "Tirolesa", "Atardecer", "Piscina", "Área de relajación"],
     },
     reviews: {
       kicker: "Opiniones reales",
@@ -209,7 +209,7 @@ const COPY = {
     gallery: {
       kicker: "Gallery",
       title: "This is Sierra Campestre",
-      items: ["Main pool", "Green shaded areas", "Cute animals", "The grill", "Zip line", "Sunsets", "Swimming pool", "Relaxing area"], // DUMMY captions — adjust to match your real photos
+      items: ["Main area", "Green shaded areas", "Cute animals", "The grill", "Zip line", "Sunsets", "Swimming pool", "Relaxing area"], // DUMMY captions — adjust to match your real photos
     },
     reviews: {
       kicker: "Real reviews",

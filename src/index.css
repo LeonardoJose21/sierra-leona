@@ -1,184 +1,214 @@
-/* ────────────────────────────────────────────────────────────────
-   Tailwind
-   If your project is on Tailwind v4 (the current default with the
-   Vite plugin), keep the line below.
-   If you're on Tailwind v3 instead, replace it with:
-     @tailwind base;
-     @tailwind components;
-     @tailwind utilities;
-   ──────────────────────────────────────────────────────────────── */
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-/* Fonts: Fraunces (display serif, warm + a little coastal-colonial)
-   paired with Work Sans (body). Self-hosting is better for production —
-   this @import is the fastest way to get it working today. */
+/*
+  Sierra Campestre — design tokens
+  Palette grounded in the actual subject: the blue-and-yellow macaw
+  ("guacamaya azul") native to the Sierra Nevada de Santa Marta, plus the
+  pool/lagoon, foliage, and whitewashed finca walls.
+*/
+@theme {
+  --color-sand: #fbf7ec;
+  --color-sand-deep: #f2ead7;
+  --color-ink: #16302a;
+  --color-ink-soft: #3e5a4e;
+  --color-lagoon: #146c8e;
+  --color-lagoon-deep: #0b4258;
+  --color-lagoon-mist: #e4f1f4;
+  --color-leaf: #3f6b33;
+  --color-leaf-deep: #274a1e;
+  --color-mango: #eda63b;
+  --color-mango-deep: #c97f1e;
+  --color-whatsapp: #25d366;
+  --color-whatsapp-deep: #128c4a;
 
+  --font-display: "Fraunces", "Iowan Old Style", serif;
+  --font-body: "Karla", "Helvetica Neue", sans-serif;
 
-:root {
-  /* ── Color tokens — Santa Marta by way of Caribbean sea + clay roofs ── */
-  --ink: #16231f;      /* near-black, warm teal-charcoal for text */
-  --sand: #fbf5ea;      /* base background, sun-bleached sand */
-  --sand-2: #f1e7d3;    /* deeper sand for section/card contrast */
-  --teal: #0e5c55;      /* primary — lagoon teal */
-  --teal-deep: #0a3f3b; /* dark band background */
-  --clay: #c05a2c;      /* secondary accent — burnt roof-tile clay */
-  --aqua: #4fb8ac;      /* small accent — shallow-water aqua */
-  --gold: #d9a441;      /* review stars only */
-
-  /* ── Motion — custom curves, not the weak CSS built-ins ── */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background: var(--sand);
-  color: var(--ink);
-  font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.font-display {
-  font-family: "Fraunces", ui-serif, Georgia, serif;
-}
-
-::selection {
-  background: var(--teal);
-  color: var(--sand);
-}
-
-/* Visible, intentional focus ring everywhere — never remove focus outlines */
-:focus-visible {
-  outline: 2px solid var(--teal);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-
-/* Skip link for keyboard users */
-.skip-link {
-  position: absolute;
-  left: 1rem;
-  top: -3rem;
-  background: var(--ink);
-  color: var(--sand);
-  padding: 0.6rem 1rem;
-  border-radius: 0.5rem;
-  z-index: 100;
-  transition: top 160ms var(--ease-out);
-}
-.skip-link:focus {
-  top: 1rem;
-}
-
-/* Hide scrollbar on horizontal scroll-snap rows, keep it functional */
-.scroll-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scroll-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Coastal wave divider under the hero — a shape, not a gradient blob */
-.wave-divider {
-  display: block;
-  width: 100%;
-  height: auto;
-  line-height: 0;
-}
-
-/* Hero entrance — one orchestrated moment on load, staggered, then still */
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
+@layer base {
+  * {
+    box-sizing: border-box;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-mango);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-lagoon);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  a {
+    color: inherit;
   }
 }
-.rise-in {
-  animation: rise-in 700ms var(--ease-out) both;
-}
-.rise-in-1 { animation-delay: 60ms; }
-.rise-in-2 { animation-delay: 160ms; }
-.rise-in-3 { animation-delay: 260ms; }
-.rise-in-4 { animation-delay: 360ms; }
 
-/* Language flag button — quick, deliberate press feedback */
-.flag-btn {
-  transition: transform 120ms var(--ease-out), opacity 160ms ease;
-}
-.flag-btn:active {
-  transform: scale(0.93);
-}
-
-/* Mobile menu panel */
-.mobile-panel {
-  transform-origin: top right;
-  transition: opacity 180ms var(--ease-out), transform 220ms var(--ease-out);
-}
-.mobile-panel[data-state="closed"] {
+/* ---------- Scroll reveal (single, restrained pattern reused everywhere) ---------- */
+.reveal {
   opacity: 0;
-  transform: scale(0.97) translateY(-6px);
+  transform: translateY(18px);
+  transition:
+    opacity 700ms var(--ease-out-strong),
+    transform 700ms var(--ease-out-strong);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 80ms; }
+.reveal-delay-2 { transition-delay: 160ms; }
+.reveal-delay-3 { transition-delay: 240ms; }
+.reveal-delay-4 { transition-delay: 320ms; }
+
+/* ---------- WhatsApp floating button ---------- */
+.wa-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--color-whatsapp);
+  animation: wa-pulse 2600ms var(--ease-in-out-strong) infinite;
+}
+
+@keyframes wa-pulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+  70% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.wa-tooltip {
+  opacity: 0;
+  transform: translateX(8px) scale(0.97);
+  transition:
+    opacity 160ms ease-out,
+    transform 160ms ease-out;
   pointer-events: none;
 }
-.mobile-panel[data-state="open"] {
+.wa-button:hover .wa-tooltip,
+.wa-button:focus-visible .wa-tooltip {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translateX(0) scale(1);
 }
 
-/* Lightbox */
-.lightbox-backdrop {
-  transition: opacity 220ms var(--ease-out);
-}
-.lightbox-figure {
-  transition: transform 240ms var(--ease-out), opacity 240ms var(--ease-out);
-}
-
-/* Review card hover — subtle lift, fast + cheap */
-.review-card {
-  transition: transform 180ms var(--ease-out), border-color 180ms ease;
+.wa-button {
+  transition: transform 160ms var(--ease-out-strong);
 }
 @media (hover: hover) and (pointer: fine) {
-  .review-card:hover {
-    transform: translateY(-3px);
+  .wa-button:hover {
+    transform: translateY(-2px);
   }
 }
-
-/* Gallery tile hover image zoom, gated to real pointers only */
-.gallery-img {
-  transition: transform 400ms var(--ease-in-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .gallery-tile:hover .gallery-img {
-    transform: scale(1.045);
-  }
+.wa-button:active {
+  transform: scale(0.96);
 }
 
-/* Respect reduced motion: keep opacity, drop movement */
+/* ---------- Header ---------- */
+.site-header {
+  transition:
+    background-color 260ms ease,
+    box-shadow 260ms ease,
+    border-color 260ms ease;
+}
+
+/* ---------- Mobile menu ---------- */
+.mobile-menu {
+  transition:
+    opacity 220ms var(--ease-out-strong),
+    transform 220ms var(--ease-out-strong);
+}
+
+/* ---------- Underline link treatment (nav / inline links) ---------- */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -2px;
+  height: 1.5px;
+  background: currentColor;
+  transition: right 220ms var(--ease-out-strong);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  right: 0;
+}
+
+/* ---------- Star rating ---------- */
+.star {
+  color: var(--color-mango);
+}
+
+/* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .rise-in,
-  .review-card,
-  .gallery-img,
-  .mobile-panel,
-  .lightbox-figure,
-  .flag-btn {
-    animation: none !important;
-    transition: opacity 160ms linear !important;
-    transform: none !important;
+  .reveal {
+    transition: opacity 300ms ease;
+    transform: none;
   }
+  .wa-ring {
+    animation: none;
+    display: none;
+  }
+  .wa-button:hover {
+    transform: none;
+  }
+}
+
+/* ---------- Scrollbar (light touch, not a redesign) ---------- */
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-sand);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-sand-deep);
+  border-radius: 999px;
+  border: 3px solid var(--color-sand);
 }

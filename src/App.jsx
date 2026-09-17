@@ -1,458 +1,365 @@
-/**
- * ───────────────────────────────────────────────────────────────────────
- * Casa Bahía — Santa Marta apartment landing page
- * ───────────────────────────────────────────────────────────────────────
- *
- * BEFORE THIS RUNS, READ THIS:
- *
- * 1) IMAGES — this file imports 9 images from ./assets by these exact
- *    names. Rename your downloaded photos to match (or edit the import
- *    lines below to point at your real filenames):
- *
- *      hero.jpg              wide shot of the building / pool, for the hero
- *      about-1.jpg           interior or pool photo, taller crop
- *      about-2.jpg           second interior photo, shorter crop
- *      gallery-pool.jpg
- *      gallery-living.jpg
- *      gallery-bedroom.jpg
- *      gallery-kitchen.jpg
- *      gallery-terrace.jpg
- *      gallery-exterior.jpg
- *
- * 2) DUMMY DATA — search this file for "REPLACE" to find every value
- *    that's a placeholder: the business name "Casa Bahía", the hero/about
- *    copy, the about-section stats, the WhatsApp prefilled message, and
- *    the footer social links. The address, phone number, Google rating,
- *    review count, business-profile link, and all four customer reviews
- *    are your real data and are already wired in.
- *
- * 3) WHATSAPP NUMBER — wired to 573014737730 (Colombia country code +
- *    your number). Update WHATSAPP_NUMBER below if it changes.
- * ───────────────────────────────────────────────────────────────────────
- */
+import { useEffect, useRef, useState, useCallback } from "react";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+/* =========================================================================
+   SIERRA CAMPESTRE — landing page
+   -------------------------------------------------------------------------
+   Real data used below (from the brief):
+     - Google rating: 4.4 (16 reviews)
+     - Google Business profile: https://share.google/ACfExejzW4hhLi1cB
+     - Phone: 301 608 1833 (Colombian mobile, assumed +57 country code)
+     - City: Santa Marta, Magdalena, Colombia
+     - Instagram: @sierra.campestre — 6,424 followers, 143 posts
+     - The 4 Google reviews quoted verbatim, each linked to its source
 
-import hero from "./assets/hero.jpg";
-import about1 from "./assets/about-1.jpg";
-import about2 from "./assets/about-2.jpg";
-import galleryPool from "./assets/gallery-pool.jpg";
-import galleryLiving from "./assets/gallery-living.jpg";
-import galleryBedroom from "./assets/gallery-bedroom.jpg";
-import galleryKitchen from "./assets/gallery-kitchen.jpg";
-import galleryTerrace from "./assets/gallery-terrace.jpg";
-import galleryExterior from "./assets/gallery-exterior.jpg";
+   Everything else (exact address, coordinates, hours, prices, capacity,
+   founding year, gallery captions) is placeholder content clearly marked
+   with a "DUMMY" comment — search "DUMMY" to find every spot that needs
+   your real data before you ship this.
+   ========================================================================= */
 
-/* ───────────────────────── Real business data ───────────────────────── */
+// ---- Replace these with your own images from src/assets -------------------
+// Drop files with these exact names in src/assets, or edit the paths below.
+import heroImg from "./assets/hero.jpg";
+import aboutImg from "./assets/about.png";
+import gallery1 from "./assets/gallery-1.png";
+import gallery2 from "./assets/gallery-2.png";
+import gallery3 from "./assets/gallery-3.png";
+import gallery4 from "./assets/gallery-4.png";
+import gallery5 from "./assets/gallery-5.png";
+import gallery6 from "./assets/gallery-6.png";
+import gallery7 from "./assets/gallery-7.png";
+import gallery8 from "./assets/gallery-8.png";
 
-const ADDRESS = "Cra. 22 #12-12, Comuna 4, Santa Marta, Magdalena";
-const PHONE_DISPLAY = "+57 301 473 7730";
-const WHATSAPP_NUMBER = "573014737730";
-const GOOGLE_PROFILE_URL = "https://maps.app.goo.gl/iMLBiynLksu4m1tt8";
-const GOOGLE_RATING = 4.9;
-const GOOGLE_REVIEW_COUNT = 23;
-const MAP_EMBED_SRC = `https://www.google.com/maps?q=${encodeURIComponent(
-  ADDRESS
-)}&output=embed`;
+// ---- Business constants ----------------------------------------------------
+const PHONE_DISPLAY = "+57 301 608 1833";
+const WHATSAPP_NUMBER = "573016081833"; // DUMMY country code assumption — confirm +57
+const GOOGLE_PROFILE_URL = "https://share.google/ACfExejzW4hhLi1cB";
+const INSTAGRAM_URL = "https://www.instagram.com/sierra.campestre/";
+const INSTAGRAM_HANDLE = "@sierra.campestre";
+const INSTAGRAM_FOLLOWERS = "6,424";
+const RATING = 4.4;
+const RATING_COUNT = 16;
 
 const REVIEWS = [
   {
-    id: "roberto",
-    author: "Roberto Carlos De La Torre",
-    url: "https://maps.app.goo.gl/9NQutHys1xb12tmL6",
-    es: "El apartamento es excelente para vacacionar, descansar y disfrutar en familia, pareja o con amigos. La ubicación es perfecta para ir a todos los puntos de interés de la ciudad, incluyendo las playas. Y la piscina que tiene el apartamento es un plus increíble. En conclusión, un lugar predilecto para disfrutar Santa Marta.",
-    en: "The apartment is excellent for a vacation, to rest and enjoy with family, a partner, or friends. The location is perfect for reaching every point of interest in the city, including the beaches. And the pool is an incredible bonus. In short, a favorite spot to enjoy Santa Marta.",
+    name: "Joseph A Villanueva Z",
+    stars: 5,
+    url: "https://share.google/Lv2KoIXhtqYM6Pg55",
+    es: "Es un buen sitio para compartir con familia y amigos, cerca de la ciudad, y con un excelente precio, la comida espectacular.",
+    en: "A great place to spend time with family and friends, close to the city, excellent prices, and the food is spectacular.",
   },
   {
-    id: "saira",
-    author: "Saira Elena Alarcon Soto",
-    url: "https://maps.app.goo.gl/bcb2S7idu6tdTZx8A",
-    es: "Es un bello apartamento totalmente amoblado, muy limpio y bien ubicado, con una piscina espectacular, un área social muy cómoda. Disponible de conexión WiFi y una computadora de escritorio, camas confortables y el precio excelente, lo recomiendo.",
-    en: "It's a beautiful, fully furnished apartment — very clean and well located, with a spectacular pool and a comfortable social area. It has WiFi and a desktop computer, comfortable beds, and an excellent price. I recommend it.",
+    name: "MIGUEL ACOSTA R",
+    stars: 5,
+    url: "https://share.google/Ho9XlBeVr5EatCNf0",
+    es: "Buen lugar para pasar en familia. Excelente atención.",
+    en: "A good place to spend time with family. Excellent service.",
   },
   {
-    id: "juan",
-    author: "Juan De La Torre",
-    url: "https://maps.app.goo.gl/7ZtNLTBuVJH74XGw6",
-    es: "Excelente sitio turístico en la ciudad de Santa Marta para compartir en familia, excelente ubicación, está cerca de cualquier lugar que desees visitar, acogedor e independiente. Te aseguro lo pasarás muy feliz.",
-    en: "An excellent place to stay in Santa Marta for a family trip — great location, close to anywhere you'd want to visit, cozy and private. I promise you'll have a wonderful time.",
+    name: "ricardo obando",
+    stars: 4,
+    url: "https://share.google/kQ9obscVZ2Y8nvHvM",
+    es: "Buen sitio para pasar un día de descanso.",
+    en: "A good spot for a relaxing day off.",
   },
   {
-    id: "jhojan",
-    author: "Jhojan Vargas",
-    url: "https://maps.app.goo.gl/3sAJh2k6rnebHyTA6",
-    es: "Me parece un hotel ideal para un viaje de negocios, unas vacaciones en familia o solo, por el hecho de que me brindaron los servicios necesarios para estar cómodo en mi estadía. Por otro lado, cumplen al pie de la letra las reglas de bioseguridad que exige esta contingencia. También quiero destacar un excelente cuidado de la piscina y su área, de fácil acceso.",
-    en: "I think it's an ideal place for a business trip, a family vacation, or traveling solo — they provided everything I needed to feel comfortable during my stay. They also followed biosecurity rules closely, and I want to highlight how well they keep the pool and surrounding area, with easy access.",
+    name: "Paula Mejía",
+    stars: 5,
+    url: "https://share.google/2ews7jyL9W8vjU5JV",
+    es: "Muy bueno! El sitio está muy bien organizado, muy limpio y bastante amplio. La piscina está súper, muy fresca y el almuerzo excelente! Carne de muy buena calidad y unos pedazos gigantes. Muy recomendado! Lo único es que por ahí hay un panal de abejitas, entonces puede convertirse en un riesgo. El resto, muy fenomenal.",
+    en: "Really good! The place is well organized, very clean and spacious. The pool is great, nice and cool, and lunch was excellent — good quality meat in huge portions. Highly recommended! The only thing is there's a beehive nearby, which can be a bit of a risk. Everything else was great.",
   },
 ];
 
-const GALLERY = [
-  { id: "pool", img: galleryPool, es: "La piscina", en: "The pool", tall: true },
-  { id: "living", img: galleryLiving, es: "Sala y área social", en: "Living & social area", tall: false },
-  { id: "bedroom", img: galleryBedroom, es: "Habitación", en: "Bedroom", tall: false },
-  { id: "kitchen", img: galleryKitchen, es: "Cocina", en: "Kitchen", tall: true },
-  { id: "terrace", img: galleryTerrace, es: "Terraza", en: "Terrace", tall: false },
-  { id: "exterior", img: galleryExterior, es: "Fachada", en: "Exterior", tall: false },
-];
-
-/* ─────────────────────────── Translations ─────────────────────────── */
-
-const dict = {
+// ---- i18n -------------------------------------------------------------------
+const COPY = {
   es: {
-    nav: { home: "Inicio", about: "Nosotros", amenities: "Comodidades", gallery: "Galería", reviews: "Opiniones", location: "Ubicación" },
-    navCta: "Reservar por WhatsApp",
-    skip: "Ir al contenido",
+    htmlLang: "es",
+    title: "Sierra Campestre | Pasadía, Hospedaje y Eventos en Santa Marta",
+    description:
+      "Pasadía con piscina, hospedaje, restaurante y eventos campestres cerca de Santa Marta, Magdalena. Reserva por WhatsApp. Calificación 4.4★ en Google.",
+    nav: { about: "Nosotros", services: "Servicios", gallery: "Galería", reviews: "Opiniones", location: "Ubicación", book: "Reservar" },
     hero: {
-      kicker: "Santa Marta, Magdalena",
-      // REPLACE: headline/subhead copy — written from the reviews, but yours to make more specific
-      title: "Un apartamento con piscina, a un paso del mar en Santa Marta",
-      subtitle: "Un espacio propio para descansar en familia, en pareja o con amigos — cerca de todo lo que hace especial a Santa Marta.",
-      primaryCta: "Reservar por WhatsApp",
-      secondaryCta: "Ver comodidades",
-      ratingLabel: "en Google",
-      ratingLinkLabel: `Ver ${GOOGLE_REVIEW_COUNT} reseñas`,
+      pill: "Santa Marta, Magdalena",
+      title: "Naturaleza, piscina y buena mesa a las puertas de Santa Marta.",
+      subtitle: "Pasadías, hospedaje, restaurante y eventos en medio del verde de la Sierra Nevada.",
+      ctaPrimary: "Reservar por WhatsApp",
+      ctaSecondary: "Ver el lugar",
     },
+    stats: [
+      { value: "4.4★", label: "en Google", sub: `${RATING_COUNT} reseñas` },
+      { value: "6.4K+", label: "en Instagram", sub: "comunidad que nos sigue" },
+      { value: "4", label: "experiencias", sub: "pasadía, hospedaje, restaurante y eventos" }, // real count, not dummy
+      { value: "100%", label: "al aire libre", sub: "verde de la Sierra Nevada" },
+    ],
     about: {
-      heading: "Tu propio apartamento en el corazón de Santa Marta",
-      // REPLACE: paragraph is a reasonable starting draft, not verified copy
-      body: "Comuna 4 queda cerca de todo: el centro histórico, la Quinta de San Pedro Alejandrino, la marina y las playas de la ciudad. Aquí tienes un apartamento completo — no una habitación de hotel — con piscina, zona social y todo lo necesario para sentirte en casa desde el primer día.",
-      // REPLACE: these three numbers are placeholders
-      stat1Num: "500+", stat1Label: "huéspedes felices",
-      stat2Num: "5", stat2Label: "años recibiendo viajeros",
-      stat3Num: `${GOOGLE_RATING}`, stat3Label: "calificación en Google",
+      kicker: "Quiénes somos",
+      title: "Un espacio verde para desconectarse de verdad.",
+      body: "Sierra Campestre es una finca campestre a minutos de Santa Marta, pensada para bajar el ritmo: piscina, sombra de árboles grandes, comida casera y el paso tranquilo del campo. Ya sea un pasadía en familia, un fin de semana de hospedaje o un evento especial, aquí el punto de partida es siempre el mismo: naturaleza de verdad.", // DUMMY: replace with real history/founding story
+      cta: "Escríbenos por WhatsApp",
     },
-    amenities: {
-      heading: "Todo lo que necesitas, y algo más",
+    services: {
+      kicker: "Qué encuentras aquí",
+      title: "Cuatro formas de disfrutar Sierra Campestre",
       items: [
-        { icon: "pool", title: "Piscina", body: "Una piscina espectacular — el favorito de nuestros huéspedes para refrescarse en familia." },
-        { icon: "desk", title: "WiFi y zona de trabajo", body: "Conexión WiFi y computador de escritorio para quienes viajan por trabajo." },
-        { icon: "users", title: "Ideal en familia", body: "Camas confortables y espacio de sobra para descansar en familia, pareja o con amigos." },
-        { icon: "pin", title: "Ubicación privilegiada", body: "A pocos minutos del centro histórico, la marina y las playas de Santa Marta." },
-        { icon: "shield", title: "Limpio y seguro", body: "Bioseguridad y limpieza cuidadas al detalle en cada estadía." },
+        {
+          name: "Pasadía",
+          desc: "Piscina, zonas verdes y sombra para pasar el día completo en familia.", // DUMMY: add price/hours
+          note: "Desde $ — DUMMY, confirmar tarifa",
+        },
+        {
+          name: "Hospedaje",
+          desc: "Habitaciones y cabañas para quedarte una o varias noches.", // DUMMY
+          note: "Capacidad — DUMMY, confirmar",
+        },
+        {
+          name: "Restaurante",
+          desc: "Carnes a la parrilla y comida típica, con porciones generosas según nuestros visitantes.",
+          note: "Reservas para grupos grandes recomendadas",
+        },
+        {
+          name: "Eventos",
+          desc: "Cumpleaños, matrimonios campestres y eventos empresariales en un entorno natural.", // DUMMY
+          note: "Capacidad para — DUMMY personas",
+        },
       ],
     },
-    gallery: { heading: "Así es el apartamento", sub: "Fotos reales del espacio — reemplaza estas por las tuyas." },
+    gallery: {
+      kicker: "Galería",
+      title: "Así se vive Sierra Campestre",
+      // DUMMY captions — adjust to match your real photos
+      items: ["Piscina principal", "Zonas verdes y sombra", "Animalitos", "La parrilla", "Tirolesa", "Atardecer", "Piscina", "Área de relajación"],
+    },
     reviews: {
-      heading: "Lo que dicen quienes ya se hospedaron",
-      sub: "Reseñas reales, verificadas en Google. Puedes leerlas directamente en el perfil del negocio.",
-      readOnGoogle: "Ver en Google",
-      viewProfile: "Ver perfil completo en Google",
+      kicker: "Opiniones reales",
+      title: "Lo que dicen quienes ya vinieron",
+      ratingLabel: `${RATING} de 5 · ${RATING_COUNT} reseñas en Google`,
+      seeAll: "Ver todas las reseñas en Google",
+      seeThis: "Ver esta reseña en Google",
+    },
+    instagram: {
+      kicker: "Síguenos",
+      title: "Vive la naturaleza, relájate y disfruta con nosotros",
+      followers: "seguidores",
+      cta: "Seguir en Instagram",
     },
     location: {
-      heading: "Cómo llegar",
-      body: "Coordina tu llegada y resuelve cualquier duda escribiendo directamente por WhatsApp.",
-      addressLabel: "Dirección",
-      phoneLabel: "Teléfono",
-      whatsappCta: "Escríbenos por WhatsApp",
+      kicker: "Cómo llegar",
+      title: "Te esperamos en Santa Marta",
+      address: "Vereda El Campano, Santa Marta, Magdalena", // DUMMY: replace with exact address
+      addressNote: "Dirección exacta pendiente de confirmar",
+      hours: "Todos los días, 9:00 a.m. – 6:00 p.m.", // DUMMY
+      hoursNote: "Horario de referencia — confirmar",
+      phone: "Llamar",
+      whatsapp: "Escribir por WhatsApp",
+      mapsCta: "Ver en Google Maps",
     },
-    cta: {
-      heading: "¿Listo para tu próxima escapada a Santa Marta?",
-      body: "Escríbenos por WhatsApp y te ayudamos a planear tu estadía.",
-      button: "Reservar por WhatsApp",
+    ctaBand: {
+      title: "¿Listo para tu próxima escapada?",
+      subtitle: "Cuéntanos qué planeas y te ayudamos a organizarlo.",
+      cta: "Reservar por WhatsApp",
     },
     footer: {
-      // REPLACE: tagline + social links are placeholders
-      tagline: "Un apartamento con piscina en el corazón de Santa Marta.",
-      quickLinks: "Enlaces",
-      contact: "Contacto",
-      rights: "Todos los derechos reservados.",
+      tagline: "Pasadía · Hospedaje · Restaurante · Eventos",
+      rights: "Todos los derechos reservados.", // DUMMY year/legal name if different
+      madeNote: "Sitio en construcción — reemplaza los datos marcados como DUMMY antes de publicar.",
     },
-    whatsappMessage: "Hola, quiero consultar disponibilidad para el apartamento en Santa Marta.",
-    langName: "Español",
+    whatsapp: { tooltip: "Escríbenos", message: "Hola, quiero más información sobre Sierra Campestre." },
+    langSwitch: "English",
   },
   en: {
-    nav: { home: "Home", about: "About", amenities: "Amenities", gallery: "Gallery", reviews: "Reviews", location: "Location" },
-    navCta: "Book on WhatsApp",
-    skip: "Skip to content",
+    htmlLang: "en",
+    title: "Sierra Campestre | Day Trips, Lodging & Events in Santa Marta",
+    description:
+      "A pool day trip, lodging, restaurant and countryside events near Santa Marta, Colombia. Book on WhatsApp. Rated 4.4★ on Google.",
+    nav: { about: "About", services: "Services", gallery: "Gallery", reviews: "Reviews", location: "Location", book: "Book now" },
     hero: {
-      kicker: "Santa Marta, Magdalena",
-      title: "A poolside apartment, steps from the sea in Santa Marta",
-      subtitle: "A private space to unwind with family, a partner, or friends — close to everything that makes Santa Marta special.",
-      primaryCta: "Book on WhatsApp",
-      secondaryCta: "See amenities",
-      ratingLabel: "on Google",
-      ratingLinkLabel: `See ${GOOGLE_REVIEW_COUNT} reviews`,
+      pill: "Santa Marta, Magdalena",
+      title: "Nature, a pool and good food, minutes from Santa Marta.",
+      subtitle: "Day trips, lodging, restaurant and events surrounded by the green of the Sierra Nevada.",
+      ctaPrimary: "Book on WhatsApp",
+      ctaSecondary: "See the place",
     },
+    stats: [
+      { value: "4.4★", label: "on Google", sub: `${RATING_COUNT} reviews` },
+      { value: "6.4K+", label: "on Instagram", sub: "community following us" },
+      { value: "4", label: "experiences", sub: "day trips, lodging, dining and events" },
+      { value: "100%", label: "outdoors", sub: "in the Sierra Nevada green" },
+    ],
     about: {
-      heading: "Your own apartment in the heart of Santa Marta",
-      body: "Comuna 4 sits close to everything: the historic center, the Quinta de San Pedro Alejandrino, the marina, and the city's beaches. Here you get a full apartment — not just a hotel room — with a pool, a social area, and everything you need to feel at home from day one.",
-      stat1Num: "500+", stat1Label: "happy guests",
-      stat2Num: "5", stat2Label: "years hosting travelers",
-      stat3Num: `${GOOGLE_RATING}`, stat3Label: "rating on Google",
+      kicker: "Who we are",
+      title: "A green space to truly switch off.",
+      body: "Sierra Campestre is a countryside estate minutes from Santa Marta, built to slow you down: a pool, shade from big trees, home-style cooking and the unhurried pace of the countryside. Whether it's a family day trip, a weekend stay, or a special event, the starting point here is always the same: real nature.", // DUMMY
+      cta: "Message us on WhatsApp",
     },
-    amenities: {
-      heading: "Everything you need, and then some",
+    services: {
+      kicker: "What you'll find here",
+      title: "Four ways to enjoy Sierra Campestre",
       items: [
-        { icon: "pool", title: "Pool", body: "A spectacular pool — our guests' favorite spot to cool off with family." },
-        { icon: "desk", title: "WiFi & workspace", body: "WiFi and a desktop computer for anyone traveling for work." },
-        { icon: "users", title: "Family friendly", body: "Comfortable beds and plenty of room to unwind with family, a partner, or friends." },
-        { icon: "pin", title: "Prime location", body: "Minutes from the historic center, the marina, and Santa Marta's beaches." },
-        { icon: "shield", title: "Clean & secure", body: "Biosecurity and cleanliness looked after in careful detail on every stay." },
+        { name: "Day pass", desc: "Pool, green areas and shade for a full family day.", note: "From $ — DUMMY, confirm rate" },
+        { name: "Lodging", desc: "Rooms and cabins for a night or a few.", note: "Capacity — DUMMY, confirm" },
+        {
+          name: "Restaurant",
+          desc: "Grilled meats and local dishes, with generous portions according to our visitors.",
+          note: "Reservations recommended for large groups",
+        },
+        { name: "Events", desc: "Birthdays, countryside weddings and corporate events in a natural setting.", note: "Capacity for — DUMMY people" },
       ],
     },
-    gallery: { heading: "Take a look inside", sub: "Real photos of the space — swap these for your own." },
+    gallery: {
+      kicker: "Gallery",
+      title: "This is Sierra Campestre",
+      items: ["Main pool", "Green shaded areas", "Cute animals", "The grill", "Zip line", "Sunsets", "Swimming pool", "Relaxing area"], // DUMMY captions — adjust to match your real photos
+    },
     reviews: {
-      heading: "What past guests say",
-      sub: "Real reviews, verified on Google. You can read them directly on the business profile.",
-      readOnGoogle: "View on Google",
-      viewProfile: "View full profile on Google",
+      kicker: "Real reviews",
+      title: "What past visitors say",
+      ratingLabel: `${RATING} out of 5 · ${RATING_COUNT} Google reviews`,
+      seeAll: "See all reviews on Google",
+      seeThis: "See this review on Google",
+    },
+    instagram: {
+      kicker: "Follow along",
+      title: "Live nature, relax and enjoy with us",
+      followers: "followers",
+      cta: "Follow on Instagram",
     },
     location: {
-      heading: "How to find us",
-      body: "Coordinate your arrival and ask any questions straight over WhatsApp.",
-      addressLabel: "Address",
-      phoneLabel: "Phone",
-      whatsappCta: "Message us on WhatsApp",
+      kicker: "Getting there",
+      title: "We'll be waiting in Santa Marta",
+      address: "Vereda El Campano, Santa Marta, Magdalena", // DUMMY
+      addressNote: "Exact address to be confirmed",
+      hours: "Every day, 9:00 a.m. – 6:00 p.m.", // DUMMY
+      hoursNote: "Placeholder hours — confirm",
+      phone: "Call",
+      whatsapp: "Message on WhatsApp",
+      mapsCta: "View on Google Maps",
     },
-    cta: {
-      heading: "Ready for your next Santa Marta getaway?",
-      body: "Message us on WhatsApp and we'll help you plan your stay.",
-      button: "Book on WhatsApp",
+    ctaBand: {
+      title: "Ready for your next getaway?",
+      subtitle: "Tell us what you're planning and we'll help you set it up.",
+      cta: "Book on WhatsApp",
     },
     footer: {
-      tagline: "A poolside apartment in the heart of Santa Marta.",
-      quickLinks: "Links",
-      contact: "Contact",
+      tagline: "Day trips · Lodging · Restaurant · Events",
       rights: "All rights reserved.",
+      madeNote: "Site under construction — replace anything marked DUMMY before publishing.",
     },
-    whatsappMessage: "Hi, I'd like to check availability for the apartment in Santa Marta.",
-    langName: "English",
+    whatsapp: { tooltip: "Chat with us", message: "Hi, I'd like more information about Sierra Campestre." },
+    langSwitch: "Español",
   },
 };
 
-/* ───────────────────────── Language context ───────────────────────── */
+// ---- Small building blocks --------------------------------------------------
 
-const LangContext = createContext(null);
-function useLang() {
-  return useContext(LangContext);
+function ColombiaFlag({ className }) {
+  return (
+    <svg viewBox="0 0 30 20" className={className} aria-hidden="true">
+      <rect width="30" height="20" fill="#FCD116" />
+      <rect width="30" height="10" y="10" fill="#003893" />
+      <rect width="30" height="5" y="15" fill="#CE1126" />
+    </svg>
+  );
 }
 
-function LangProvider({ children }) {
-  const [lang, setLang] = useState(() => {
-    try {
-      return localStorage.getItem("casabahia-lang") || "es";
-    } catch {
-      return "es";
-    }
-  });
+function USFlag({ className }) {
+  return (
+    <svg viewBox="0 0 30 20" className={className} aria-hidden="true">
+      <rect width="30" height="20" fill="#B22234" />
+      {[...Array(6)].map((_, i) => (
+        <rect key={i} width="30" height="1.54" y={1.54 * (i * 2 + 1)} fill="#fff" />
+      ))}
+      <rect width="12" height="10.77" fill="#3C3B6E" />
+    </svg>
+  );
+}
+
+function MacawMark({ className }) {
+  // Minimalist geometric macaw silhouette — the "guacamaya azul" logomark.
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <path
+        d="M20 10C28 6 40 8 46 18C50 24 50 30 46 36L52 38C54 39 54 41 52 42L44 44C42 50 36 54 29 54C20 54 12 47 12 37C12 30 15 25 15 25C11 24 8 20 8 16C8 16 14 17 17 20C17 14 18 12 20 10Z"
+        fill="var(--color-lagoon)"
+      />
+      <path d="M29 54C24 54 19 51 16 47C19 49 24 50 28 49C33 48 36 44 37 40C39 44 39 49 35 52C33 53.5 31 54 29 54Z" fill="var(--color-mango)" />
+      <circle cx="24" cy="20" r="2.4" fill="var(--color-sand)" />
+      <path d="M46 18C48 19 49 21 48 23C46 22 44 20 44 18C44.7 17.6 45.4 17.7 46 18Z" fill="var(--color-mango)" />
+    </svg>
+  );
+}
+
+function Stars({ count, className = "" }) {
+  return (
+    <span className={`inline-flex gap-0.5 ${className}`} aria-hidden="true">
+      {[...Array(5)].map((_, i) => (
+        <svg key={i} width="15" height="15" viewBox="0 0 20 20" className={i < count ? "star" : "text-ink/15"} fill="currentColor">
+          <path d="M10 1.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L1.3 7.7l6.1-.6L10 1.5z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+function WhatsAppIcon({ className }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M16.02 3C9.4 3 4 8.36 4 15c0 2.34.66 4.53 1.8 6.4L4 29l7.8-1.76A11.9 11.9 0 0016.02 27C22.65 27 28 21.65 28 15S22.65 3 16.02 3zm0 21.8c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.18.94 1-4.05-.26-.4A9.7 9.7 0 016.2 15c0-5.4 4.4-9.8 9.82-9.8 5.42 0 9.82 4.4 9.82 9.8s-4.4 9.8-9.82 9.8z" />
+      <path d="M21.2 17.72c-.28-.14-1.66-.82-1.92-.91-.26-.1-.44-.14-.63.14-.19.28-.72.91-.88 1.1-.16.19-.32.2-.6.07-.28-.14-1.17-.43-2.23-1.38-.82-.73-1.38-1.63-1.54-1.91-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.5-.07-.14-.63-1.53-.87-2.1-.23-.55-.46-.47-.63-.48-.16-.01-.35-.01-.54-.01-.19 0-.5.07-.76.35-.26.28-1 1-1 2.42 0 1.43 1.02 2.82 1.16 3.01.14.19 2 3.06 4.85 4.29.68.29 1.2.47 1.62.6.68.22 1.3.19 1.79.11.55-.08 1.66-.68 1.9-1.33.23-.66.23-1.22.16-1.33-.06-.12-.25-.19-.53-.33z" />
+    </svg>
+  );
+}
+
+// Fires the callback once an element enters the viewport, then unobserves.
+function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
+
+function Reveal({ as: Tag = "div", delay, className = "", children }) {
+  const ref = useReveal();
+  const delayClass = delay ? `reveal-delay-${delay}` : "";
+  return (
+    <Tag ref={ref} className={`reveal ${delayClass} ${className}`}>
+      {children}
+    </Tag>
+  );
+}
+
+// ---- Main App ---------------------------------------------------------------
+
+export default function App() {
+  const [lang, setLang] = useState("es");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const t = COPY[lang];
 
   useEffect(() => {
-    try {
-      localStorage.setItem("casabahia-lang", lang);
-    } catch {
-      /* storage unavailable — fine, just won't persist */
+    document.documentElement.lang = t.htmlLang;
+    document.title = t.title;
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
     }
-  }, [lang]);
-
-  const value = useMemo(() => ({ lang, setLang, t: dict[lang] }), [lang]);
-  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
-}
-
-/* ───────────────────────────── Icons ─────────────────────────────
-   Small hand-tuned line-icon set, one consistent stroke weight,
-   so the amenities row doesn't lean on a generic icon-library look. */
-
-const iconBase = { fill: "none", stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round", strokeLinejoin: "round" };
-
-function IconPool({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d="M3 16c1.2 1 2.4 1 3.6 0s2.4-1 3.6 0 2.4 1 3.6 0 2.4-1 3.6 0 2.4 1 3.6 0" />
-      <path d="M3 20c1.2 1 2.4 1 3.6 0s2.4-1 3.6 0 2.4 1 3.6 0 2.4-1 3.6 0 2.4 1 3.6 0" />
-      <path d="M6 12V6a2 2 0 1 1 4 0v6" />
-      <circle cx="16" cy="6" r="2" />
-      <path d="M16 8v4" />
-    </svg>
-  );
-}
-function IconDesk({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <rect x="4" y="4" width="16" height="11" rx="1.2" />
-      <path d="M9 19h6M12 15v4" />
-      <path d="M7 8.5c1.5 2 2.5 2 3.5 0M13.5 8.5c1 2 2 2 3.5 0" />
-    </svg>
-  );
-}
-function IconUsers({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <circle cx="9" cy="8" r="3" />
-      <path d="M3.5 19c.8-3 2.8-4.5 5.5-4.5s4.7 1.5 5.5 4.5" />
-      <circle cx="17" cy="9" r="2.3" />
-      <path d="M15.2 14.8c2.2.2 3.6 1.6 4.3 4.2" />
-    </svg>
-  );
-}
-function IconPin({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d="M12 21s7-6.4 7-11.5A7 7 0 0 0 5 9.5C5 14.6 12 21 12 21Z" />
-      <circle cx="12" cy="9.5" r="2.3" />
-    </svg>
-  );
-}
-function IconShield({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d="M12 3.5 5 6v5.5C5 16 8 19.3 12 20.5c4-1.2 7-4.5 7-9V6l-7-2.5Z" />
-      <path d="m9.2 12 1.9 1.9 3.7-3.9" />
-    </svg>
-  );
-}
-function IconStar({ className, filled = true }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
-      <path d="m12 3.5 2.6 5.4 5.9.7-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.7L12 3.5Z" />
-    </svg>
-  );
-}
-function IconQuote({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-      <path d="M9.5 6C6.2 7.6 4.5 9.9 4.5 13c0 2.3 1.5 3.9 3.5 3.9 1.7 0 3-1.3 3-3 0-1.6-1.1-2.8-2.6-2.9.4-1.7 1.8-3.1 3.6-3.9L9.5 6Zm9 0c-3.3 1.6-5 3.9-5 7 0 2.3 1.5 3.9 3.5 3.9 1.7 0 3-1.3 3-3 0-1.6-1.1-2.8-2.6-2.9.4-1.7 1.8-3.1 3.6-3.9L18.5 6Z" />
-    </svg>
-  );
-}
-function IconMenu({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d="M4 7h16M4 12h16M4 17h16" />
-    </svg>
-  );
-}
-function IconClose({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  );
-}
-function IconChevron({ className, dir = "left" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d={dir === "left" ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} />
-    </svg>
-  );
-}
-function IconChat({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...iconBase}>
-      <path d="M4 12c0-4.4 3.8-8 8.5-8s8.5 3.6 8.5 8-3.8 8-8.5 8c-1 0-2-.2-2.9-.5L4 21l1.3-4.2C4.5 15.7 4 13.9 4 12Z" />
-      <path d="M8.5 11h7M8.5 14h4.5" />
-    </svg>
-  );
-}
-
-const AMENITY_ICONS = { pool: IconPool, desk: IconDesk, users: IconUsers, pin: IconPin, shield: IconShield };
-
-/* ───────────────────────────── Flags ─────────────────────────────
-   Simple, geometric — enough to read instantly as "EN" / "ES" next
-   to the labels, without pulling in an icon-font dependency. */
-
-function FlagUS({ className }) {
-  return (
-    <svg viewBox="0 0 28 20" className={className} role="img" aria-hidden="true">
-      <defs>
-        <clipPath id="us-clip">
-          <rect width="28" height="20" rx="2" />
-        </clipPath>
-      </defs>
-      <g clipPath="url(#us-clip)">
-        <rect width="28" height="20" fill="#fff" />
-        {[0, 2, 4, 6, 8, 10, 12].map((y) => (
-          <rect key={y} y={y * 1.54} width="28" height="1.54" fill="#B22234" />
-        ))}
-        <rect width="12" height="10.8" fill="#3C3B6E" />
-        {Array.from({ length: 6 }).map((_, row) =>
-          Array.from({ length: row % 2 === 0 ? 3 : 2 }).map((_, col) => (
-            <circle
-              key={`${row}-${col}`}
-              cx={2 + col * 4 + (row % 2 === 0 ? 0 : 2)}
-              cy={1.6 + row * 1.7}
-              r="0.55"
-              fill="#fff"
-            />
-          ))
-        )}
-      </g>
-    </svg>
-  );
-}
-function FlagCO({ className }) {
-  return (
-    <svg viewBox="0 0 28 20" className={className} role="img" aria-hidden="true">
-      <defs>
-        <clipPath id="co-clip">
-          <rect width="28" height="20" rx="2" />
-        </clipPath>
-      </defs>
-      <g clipPath="url(#co-clip)">
-        <rect width="28" height="20" fill="#FCD116" />
-        <rect y="10" width="28" height="5" fill="#003893" />
-        <rect y="15" width="28" height="5" fill="#CE1126" />
-      </g>
-    </svg>
-  );
-}
-
-/* ─────────────────────────── UI atoms ─────────────────────────── */
-
-function Button({ as: As = "a", variant = "primary", className = "", children, ...props }) {
-  const base = "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-medium transition-colors duration-150";
-  const variants = {
-    primary: "bg-[#0e5c55] text-[#fbf5ea] hover:bg-[#0a453f]",
-    secondary: "border border-[#16231f]/25 text-[#16231f] hover:border-[#16231f]/60",
-    onDark: "bg-[#fbf5ea] text-[#0a3f3b] hover:bg-white",
-  };
-  return (
-    <As className={`${base} ${variants[variant]} ${className}`} {...props}>
-      {children}
-    </As>
-  );
-}
-
-function WhatsAppLink({ children, className, variant = "primary" }) {
-  const { t } = useLang();
-  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.whatsappMessage)}`;
-  return (
-    <Button as="a" href={href} target="_blank" rel="noopener noreferrer" variant={variant} className={className}>
-      <IconChat className="h-4 w-4" />
-      {children}
-    </Button>
-  );
-}
-
-function RatingBadge({ className = "" }) {
-  const { t } = useLang();
-  return (
-    <a
-      href={GOOGLE_PROFILE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group flex items-center gap-3 rounded-2xl bg-[#fbf5ea] px-4 py-3 shadow-[0_18px_40px_-18px_rgba(10,63,59,0.45)] ${className}`}
-    >
-      <span className="font-display text-2xl leading-none text-[#16231f]">{GOOGLE_RATING}</span>
-      <span className="flex flex-col">
-        <span className="flex items-center gap-0.5 text-[#d9a441]">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <IconStar key={i} className="h-3.5 w-3.5" />
-          ))}
-        </span>
-        <span className="text-xs text-[#16231f]/70 underline-offset-2 group-hover:underline">
-          {t.hero.ratingLinkLabel} · {t.hero.ratingLabel}
-        </span>
-      </span>
-    </a>
-  );
-}
-
-/* ───────────────────────────── Header ───────────────────────────── */
-
-function Header() {
-  const { lang, setLang, t } = useLang();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+    meta.setAttribute("content", t.description);
+  }, [lang, t]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -461,523 +368,452 @@ function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = [
-    ["#home", t.nav.home],
-    ["#about", t.nav.about],
-    ["#amenities", t.nav.amenities],
-    ["#gallery", t.nav.gallery],
-    ["#reviews", t.nav.reviews],
-    ["#location", t.nav.location],
+  const toggleLang = useCallback(() => setLang((l) => (l === "es" ? "en" : "es")), []);
+
+  const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.whatsapp.message)}`;
+  const telHref = `tel:+${WHATSAPP_NUMBER}`;
+
+  const navItems = [
+    { href: "#nosotros", label: t.nav.about },
+    { href: "#servicios", label: t.nav.services },
+    { href: "#galeria", label: t.nav.gallery },
+    { href: "#opiniones", label: t.nav.reviews },
+    { href: "#ubicacion", label: t.nav.location },
   ];
 
+  const galleryImages = [gallery1, gallery2, gallery3, gallery4, gallery5, gallery6, gallery7, gallery8];
+
   return (
-    <header
-      className={`sticky top-0 z-40 transition-colors duration-200 ${
-        scrolled ? "bg-[#fbf5ea]/90 backdrop-blur border-b border-[#16231f]/10" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-        <a href="#home" className="font-display text-xl tracking-tight text-[#0e5c55]">
-          Casa Bahía {/* REPLACE with your real business name */}
-        </a>
+    <div className="bg-sand text-ink font-body">
+      {/* ================= HEADER ================= */}
+      <header
+        className={`site-header fixed top-0 inset-x-0 z-40 border-b ${
+          scrolled ? "bg-sand/90 backdrop-blur border-ink/10 shadow-[0_1px_0_rgba(0,0,0,0.02)]" : "bg-transparent border-transparent"
+        }`}
+      >
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
+          <a href="#inicio" className="flex items-center gap-2 shrink-0">
+            <MacawMark className="w-8 h-8" />
+            <span className="font-display text-lg text-ink">Sierra Campestre</span>
+          </a>
 
-        <nav className="hidden items-center gap-7 lg:flex">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} className="text-sm text-[#16231f]/75 transition-colors hover:text-[#0e5c55]">
-              {label}
+          <nav className="hidden md:flex items-center gap-7 text-[0.94rem] text-ink-soft">
+            {navItems.map((item) => (
+              <a key={item.href} href={item.href} className="link-underline hover:text-ink transition-colors">
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm hover:border-ink/30 transition-colors"
+              aria-label={`Switch language — ${t.langSwitch}`}
+            >
+              {lang === "es" ? <USFlag className="w-5 h-3.5 rounded-[2px]" /> : <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />}
+              {t.langSwitch}
+            </button>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium hover:bg-lagoon-deep transition-colors"
+            >
+              {t.nav.book}
             </a>
-          ))}
-        </nav>
+          </div>
 
-        <div className="flex items-center gap-3">
-          <LanguageSwitch lang={lang} setLang={setLang} />
-          <WhatsAppLink className="hidden sm:inline-flex">{t.navCta}</WhatsAppLink>
           <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            className="md:hidden p-2 -mr-2 text-ink"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Menu"
             aria-expanded={menuOpen}
-            className="rounded-full border border-[#16231f]/15 p-2 lg:hidden"
           >
-            {menuOpen ? <IconClose className="h-5 w-5" /> : <IconMenu className="h-5 w-5" />}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
           </button>
         </div>
-      </div>
 
-      <div
-        data-state={menuOpen ? "open" : "closed"}
-        className="mobile-panel absolute right-4 top-[calc(100%+0.5rem)] w-56 rounded-2xl border border-[#16231f]/10 bg-[#fbf5ea] p-4 shadow-xl lg:hidden"
-      >
-        <nav className="flex flex-col gap-3">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} onClick={() => setMenuOpen(false)} className="text-sm text-[#16231f]/80">
-              {label}
-            </a>
-          ))}
-        </nav>
-        <WhatsAppLink className="mt-4 w-full">{t.navCta}</WhatsAppLink>
-      </div>
-    </header>
-  );
-}
-
-function LanguageSwitch({ lang, setLang }) {
-  return (
-    <div className="flex items-center gap-1 rounded-full border border-[#16231f]/15 p-1">
-      <button
-        type="button"
-        onClick={() => setLang("es")}
-        aria-pressed={lang === "es"}
-        aria-label="Español"
-        className={`flag-btn flex items-center gap-1.5 rounded-full px-2 py-1 ${lang === "es" ? "bg-[#16231f]/8" : "opacity-55"}`}
-      >
-        <FlagCO className="h-3.5 w-5 rounded-[2px]" />
-        <span className="text-xs font-medium">ES</span>
-      </button>
-      <button
-        type="button"
-        onClick={() => setLang("en")}
-        aria-pressed={lang === "en"}
-        aria-label="English"
-        className={`flag-btn flex items-center gap-1.5 rounded-full px-2 py-1 ${lang === "en" ? "bg-[#16231f]/8" : "opacity-55"}`}
-      >
-        <FlagUS className="h-3.5 w-5 rounded-[2px]" />
-        <span className="text-xs font-medium">EN</span>
-      </button>
-    </div>
-  );
-}
-
-/* ───────────────────────────── Hero ───────────────────────────── */
-
-function Hero() {
-  const { t } = useLang();
-  return (
-    <section id="home" className="relative overflow-hidden">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-10 sm:px-8 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6 lg:pb-24">
-        <div className="rise-in rise-in-1">
-          <p className="text-sm font-medium tracking-wide text-[#0e5c55]">{t.hero.kicker}</p>
-          <h1 className="font-display mt-4 max-w-xl text-[2.5rem] leading-[1.08] text-[#16231f] sm:text-[3.1rem]">
-            {t.hero.title}
-          </h1>
-          <p className="font-display mt-5 max-w-md text-lg italic leading-relaxed text-[#16231f]/75">
-            {t.hero.subtitle}
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <WhatsAppLink>{t.hero.primaryCta}</WhatsAppLink>
-            <Button as="a" href="#amenities" variant="secondary">
-              {t.hero.secondaryCta}
-            </Button>
-          </div>
-        </div>
-
-        <div className="rise-in rise-in-2 relative">
-          <div className="overflow-hidden rounded-[1.75rem]">
-            <img
-              src={hero}
-              alt={t.hero.title}
-              className="h-[340px] w-full object-cover sm:h-[420px] lg:h-[480px]"
-            />
-          </div>
-          <RatingBadge className="absolute -bottom-6 left-5 rise-in rise-in-4" />
-        </div>
-      </div>
-
-      <svg className="wave-divider text-[#f1e7d3]" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
-        <path fill="currentColor" d="M0,32 C240,80 480,0 720,24 C960,48 1200,88 1440,40 L1440,80 L0,80 Z" />
-      </svg>
-    </section>
-  );
-}
-
-/* ───────────────────────────── About ───────────────────────────── */
-
-function About() {
-  const { t } = useLang();
-  const stats = [
-    [t.about.stat1Num, t.about.stat1Label],
-    [t.about.stat2Num, t.about.stat2Label],
-    [t.about.stat3Num, t.about.stat3Label],
-  ];
-  return (
-    <section id="about" className="bg-[#f1e7d3] py-20">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center lg:gap-16">
-        <div>
-          <h2 className="font-display max-w-md text-3xl leading-tight text-[#16231f] sm:text-4xl">
-            {t.about.heading}
-          </h2>
-          <p className="mt-5 max-w-md leading-relaxed text-[#16231f]/75">{t.about.body}</p>
-          <dl className="mt-10 grid grid-cols-3 gap-6 border-t border-[#16231f]/15 pt-6">
-            {stats.map(([num, label]) => (
-              <div key={label}>
-                <dt className="sr-only">{label}</dt>
-                <dd className="font-display text-2xl text-[#0e5c55] sm:text-3xl">{num}</dd>
-                <p className="mt-1 text-xs leading-snug text-[#16231f]/65">{label}</p>
-              </div>
+        {/* Mobile menu */}
+        <div
+          className={`mobile-menu md:hidden overflow-hidden ${
+            menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+          }`}
+          style={{ transitionProperty: "max-height, opacity" }}
+        >
+          <div className="px-5 pb-6 pt-2 flex flex-col gap-4 bg-sand border-b border-ink/10">
+            {navItems.map((item) => (
+              <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className="text-ink-soft text-base">
+                {item.label}
+              </a>
             ))}
-          </dl>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <img src={about1} alt="" className="col-span-1 h-64 w-full rounded-2xl object-cover sm:h-80" />
-          <img src={about2} alt="" className="col-span-1 mt-8 h-56 w-full rounded-2xl object-cover sm:mt-12 sm:h-72" />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ───────────────────────────── Amenities ───────────────────────────── */
-
-function Amenities() {
-  const { t } = useLang();
-  const [first, ...rest] = t.amenities.items;
-  const FirstIcon = AMENITY_ICONS[first.icon];
-
-  return (
-    <section id="amenities" className="py-20">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <h2 className="font-display max-w-md text-3xl leading-tight text-[#16231f] sm:text-4xl">
-          {t.amenities.heading}
-        </h2>
-
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">
-          <div className="flex flex-col justify-between rounded-3xl bg-[#0e5c55] p-8 text-[#fbf5ea] lg:col-span-2 lg:row-span-2">
-            <FirstIcon className="h-9 w-9" />
-            <div className="mt-16">
-              <h3 className="font-display text-2xl">{first.title}</h3>
-              <p className="mt-2 max-w-sm text-[#fbf5ea]/80">{first.body}</p>
+            <div className="flex items-center gap-3 pt-2">
+              <button onClick={toggleLang} className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm">
+                {lang === "es" ? <USFlag className="w-5 h-3.5 rounded-[2px]" /> : <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />}
+                {t.langSwitch}
+              </button>
+              <a href={waHref} target="_blank" rel="noopener noreferrer" className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium">
+                {t.nav.book}
+              </a>
             </div>
           </div>
-
-          {rest.map((item) => {
-            const Icon = AMENITY_ICONS[item.icon];
-            return (
-              <div key={item.title} className="rounded-3xl border border-[#16231f]/10 bg-[#fbf5ea] p-6">
-                <Icon className="h-7 w-7 text-[#c05a2c]" />
-                <h3 className="font-display mt-4 text-lg text-[#16231f]">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#16231f]/70">{item.body}</p>
-              </div>
-            );
-          })}
         </div>
-      </div>
-    </section>
-  );
-}
+      </header>
 
-/* ───────────────────────────── Gallery ───────────────────────────── */
+      {/* ================= HERO ================= */}
+      <section id="inicio" className="relative pt-16">
+        <div className="relative h-[86vh] min-h-[560px] max-h-[840px] overflow-hidden">
+          <img
+            src={heroImg}
+            alt={lang === "es" ? "Piscina y zona verde de Sierra Campestre en Santa Marta" : "Sierra Campestre pool and green grounds in Santa Marta"}
+            className="absolute inset-0 w-full h-full object-cover"
+            fetchpriority="high"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(11,66,88,0.28) 0%, rgba(11,66,88,0.12) 40%, rgba(22,48,42,0.82) 100%)" }}
+          />
 
-function Gallery() {
-  const { lang, t } = useLang();
-  const [openId, setOpenId] = useState(null);
-  const openIndex = GALLERY.findIndex((g) => g.id === openId);
+          <div className="relative h-full mx-auto max-w-6xl px-5 sm:px-8 flex flex-col justify-end pb-14 sm:pb-20">
+            <div className="inline-flex items-center gap-2 self-start rounded-full bg-sand/90 backdrop-blur px-3.5 py-1.5 mb-6 text-sm text-ink-soft">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-lagoon">
+                <path d="M12 21s-7-6.1-7-11a7 7 0 1114 0c0 4.9-7 11-7 11z" />
+                <circle cx="12" cy="10" r="2.6" />
+              </svg>
+              {t.hero.pill}
+            </div>
 
-  const close = () => setOpenId(null);
-  const step = (delta) => {
-    if (openIndex === -1) return;
-    const next = (openIndex + delta + GALLERY.length) % GALLERY.length;
-    setOpenId(GALLERY[next].id);
-  };
+            <h1 className="font-display text-sand text-[2.6rem] sm:text-6xl lg:text-[4.5rem] leading-[1.02] max-w-3xl">
+              {t.hero.title}
+            </h1>
+            <p className="mt-5 text-sand/90 text-lg sm:text-xl max-w-xl leading-relaxed">{t.hero.subtitle}</p>
 
-  useEffect(() => {
-    if (openId === null) return;
-    const onKey = (e) => {
-      if (e.key === "Escape") close();
-      if (e.key === "ArrowLeft") step(-1);
-      if (e.key === "ArrowRight") step(1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openId]);
-
-  return (
-    <section id="gallery" className="bg-[#f1e7d3] py-20">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-display text-3xl leading-tight text-[#16231f] sm:text-4xl">{t.gallery.heading}</h2>
-          <p className="max-w-xs text-sm text-[#16231f]/60">{t.gallery.sub}</p>
-        </div>
-
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {GALLERY.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setOpenId(item.id)}
-              className={`gallery-tile group relative overflow-hidden rounded-2xl ${item.tall ? "row-span-2" : ""}`}
-            >
-              <img
-                src={item.img}
-                alt={lang === "en" ? item.en : item.es}
-                className={`gallery-img h-full w-full object-cover ${item.tall ? "aspect-[3/4]" : "aspect-square"}`}
-              />
-              <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#16231f]/70 to-transparent px-3 pb-2 pt-6 text-left text-xs font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                {lang === "en" ? item.en : item.es}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {openId !== null && (
-        <div
-          className="lightbox-backdrop fixed inset-0 z-50 flex items-center justify-center bg-[#16231f]/90 px-4"
-          role="dialog"
-          aria-modal="true"
-          onClick={close}
-        >
-          <button
-            type="button"
-            onClick={close}
-            aria-label="Close"
-            className="absolute right-5 top-5 rounded-full bg-[#fbf5ea]/10 p-2 text-[#fbf5ea] hover:bg-[#fbf5ea]/20"
-          >
-            <IconClose className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); step(-1); }}
-            aria-label="Previous"
-            className="absolute left-3 rounded-full bg-[#fbf5ea]/10 p-2 text-[#fbf5ea] hover:bg-[#fbf5ea]/20 sm:left-6"
-          >
-            <IconChevron dir="left" className="h-6 w-6" />
-          </button>
-          <figure className="lightbox-figure max-w-3xl" onClick={(e) => e.stopPropagation()}>
-            <img src={GALLERY[openIndex].img} alt="" className="max-h-[75vh] w-full rounded-xl object-contain" />
-            <figcaption className="mt-3 text-center text-sm text-[#fbf5ea]/80">
-              {lang === "en" ? GALLERY[openIndex].en : GALLERY[openIndex].es}
-            </figcaption>
-          </figure>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); step(1); }}
-            aria-label="Next"
-            className="absolute right-3 rounded-full bg-[#fbf5ea]/10 p-2 text-[#fbf5ea] hover:bg-[#fbf5ea]/20 sm:right-6"
-          >
-            <IconChevron dir="right" className="h-6 w-6" />
-          </button>
-        </div>
-      )}
-    </section>
-  );
-}
-
-/* ───────────────────────────── Reviews ───────────────────────────── */
-
-function Reviews() {
-  const { lang, t } = useLang();
-  const scrollerRef = useRef(null);
-
-  const scrollBy = (dir) => {
-    scrollerRef.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
-  };
-
-  return (
-    <section id="reviews" className="py-20">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <h2 className="font-display max-w-md text-3xl leading-tight text-[#16231f] sm:text-4xl">
-              {t.reviews.heading}
-            </h2>
-            <p className="mt-3 max-w-md text-sm text-[#16231f]/65">{t.reviews.sub}</p>
-          </div>
-
-          <a
-            href={GOOGLE_PROFILE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-2xl border border-[#16231f]/12 px-5 py-3"
-          >
-            <span className="font-display text-3xl text-[#16231f]">{GOOGLE_RATING}</span>
-            <span className="flex flex-col text-xs text-[#16231f]/65">
-              <span className="flex items-center gap-0.5 text-[#d9a441]">
-                {Array.from({ length: 5 }).map((_, i) => <IconStar key={i} className="h-3 w-3" />)}
-              </span>
-              <span className="underline-offset-2 hover:underline">{t.reviews.viewProfile}</span>
-            </span>
-          </a>
-        </div>
-
-        <div className="relative mt-10">
-          <div ref={scrollerRef} className="scroll-hide flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4">
-            {REVIEWS.map((r, i) => (
-              <article
-                key={r.id}
-                className={`review-card w-[300px] flex-shrink-0 snap-start rounded-2xl bg-[#f1e7d3] p-6 sm:w-[340px] ${
-                  i % 2 === 0 ? "border-t-4 border-[#0e5c55]" : "border-t-4 border-[#c05a2c]"
-                }`}
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-mango text-ink px-6 py-3.5 font-medium hover:bg-mango-deep transition-colors"
               >
-                <IconQuote className="h-6 w-6 text-[#16231f]/20" />
-                <p className="font-display mt-4 text-[15px] italic leading-relaxed text-[#16231f]/90">
-                  {lang === "es" ? r.es : r.en}
-                </p>
-                <div className="mt-5 flex items-center justify-between">
-                  <span className="text-sm font-medium text-[#16231f]">{r.author}</span>
+                <WhatsAppIcon className="w-5 h-5" />
+                {t.hero.ctaPrimary}
+              </a>
+              <a
+                href="#galeria"
+                className="inline-flex items-center gap-2 rounded-full border border-sand/50 text-sand px-6 py-3.5 font-medium hover:bg-sand/10 transition-colors"
+              >
+                {t.hero.ctaSecondary}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ---- Trust bar ---- */}
+        <div className="bg-lagoon-deep text-sand">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8 py-7 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+            {t.stats.map((s, i) => (
+              <div key={i} className={i > 0 ? "border-l border-sand/15 pl-6 sm:pl-8" : ""}>
+                <div className="font-display text-2xl sm:text-3xl text-mango">{s.value}</div>
+                <div className="text-sm text-sand/90 mt-1">{s.label}</div>
+                <div className="text-xs text-sand/55 mt-0.5">{s.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= ABOUT ================= */}
+      <section id="nosotros" className="py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          <Reveal className="order-2 md:order-1">
+            <p className="text-sm font-medium text-leaf">{t.about.kicker}</p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3 max-w-md">{t.about.title}</h2>
+            <p className="mt-6 text-ink-soft leading-relaxed max-w-md">{t.about.body}</p>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-8 text-lagoon font-medium link-underline"
+            >
+              {t.about.cta}
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </Reveal>
+          <Reveal delay={1} className="order-1 md:order-2">
+            <div className="relative aspect-[4/5] rounded-[1.75rem] overflow-hidden">
+              <img
+                src={aboutImg}
+                alt={lang === "es" ? "Zona de sombra y mesas en Sierra Campestre" : "Shaded seating area at Sierra Campestre"}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= SERVICES ================= */}
+      <section id="servicios" className="py-20 sm:py-28 bg-sand-deep">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <Reveal className="max-w-lg">
+            <p className="text-sm font-medium text-leaf">{t.services.kicker}</p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.services.title}</h2>
+          </Reveal>
+
+          <div className="mt-12 grid sm:grid-cols-2 gap-px bg-ink/10 rounded-2xl overflow-hidden">
+            {t.services.items.map((item, i) => (
+              <Reveal key={item.name} delay={(i % 2) + 1} className="bg-sand-deep p-8 sm:p-10">
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center"
+                  style={{ background: i % 2 === 0 ? "var(--color-lagoon-mist)" : "rgba(237,166,59,0.16)" }}
+                >
+                  <span className="font-display text-lg" style={{ color: i % 2 === 0 ? "var(--color-lagoon)" : "var(--color-mango-deep)" }}>
+                    {item.name.charAt(0)}
+                  </span>
+                </div>
+                <h3 className="font-display text-xl mt-5">{item.name}</h3>
+                <p className="mt-2.5 text-ink-soft leading-relaxed">{item.desc}</p>
+                <p className="mt-4 text-xs text-ink-soft/70 italic">{item.note}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= GALLERY ================= */}
+      <section id="galeria" className="py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <Reveal className="max-w-lg">
+            <p className="text-sm font-medium text-leaf">{t.gallery.kicker}</p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.gallery.title}</h2>
+          </Reveal>
+
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+            {galleryImages.map((src, i) => (
+              <Reveal
+                key={i}
+                delay={(i % 4) + 1}
+                className={`relative overflow-hidden rounded-xl ${i === 0 ? "col-span-2 row-span-2 aspect-square md:aspect-auto" : "aspect-square"}`}
+              >
+                <img
+                  src={src}
+                  alt={`Sierra Campestre — ${t.gallery.items[i] ?? "foto"}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <span className="absolute bottom-2.5 left-2.5 text-xs text-sand bg-ink/45 backdrop-blur px-2.5 py-1 rounded-full">
+                  {t.gallery.items[i]}
+                </span>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= REVIEWS ================= */}
+      <section id="opiniones" className="py-20 sm:py-28 bg-lagoon-deep text-sand">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <Reveal className="max-w-lg">
+            <p className="text-sm font-medium text-mango">{t.reviews.kicker}</p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.reviews.title}</h2>
+            <div className="flex items-center gap-2 mt-4">
+              <Stars count={4} />
+              <span className="text-sm text-sand/80">{t.reviews.ratingLabel}</span>
+            </div>
+          </Reveal>
+
+          <div className="mt-12 grid sm:grid-cols-2 gap-5">
+            {REVIEWS.map((r, i) => (
+              <Reveal key={r.name} delay={(i % 2) + 1} className="bg-sand/[0.06] border border-sand/15 rounded-2xl p-7">
+                <Stars count={r.stars} />
+                <p className="mt-4 text-sand/95 leading-relaxed text-[0.97rem]">"{lang === "es" ? r.es : r.en}"</p>
+                <div className="mt-6 flex items-center justify-between">
+                  <span className="text-sm font-medium text-sand/85">{r.name}</span>
                   <a
                     href={r.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[#0e5c55] underline-offset-2 hover:underline"
+                    className="text-xs text-mango link-underline"
                   >
-                    {t.reviews.readOnGoogle}
+                    {t.reviews.seeThis}
                   </a>
                 </div>
-              </article>
+              </Reveal>
             ))}
           </div>
 
-          <div className="mt-2 hidden justify-end gap-2 sm:flex">
-            <button type="button" onClick={() => scrollBy(-1)} aria-label="Previous reviews" className="rounded-full border border-[#16231f]/15 p-2 hover:border-[#16231f]/40">
-              <IconChevron dir="left" className="h-4 w-4" />
-            </button>
-            <button type="button" onClick={() => scrollBy(1)} aria-label="Next reviews" className="rounded-full border border-[#16231f]/15 p-2 hover:border-[#16231f]/40">
-              <IconChevron dir="right" className="h-4 w-4" />
-            </button>
+          <div className="mt-10 text-center">
+            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sand font-medium link-underline">
+              {t.reviews.seeAll}
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-/* ───────────────────────────── Location ───────────────────────────── */
-
-function Location() {
-  const { t } = useLang();
-  return (
-    <section id="location" className="bg-[#f1e7d3] py-20">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-        <div>
-          <h2 className="font-display text-3xl leading-tight text-[#16231f] sm:text-4xl">{t.location.heading}</h2>
-          <p className="mt-4 max-w-sm leading-relaxed text-[#16231f]/70">{t.location.body}</p>
-
-          <div className="mt-8 space-y-5">
-            <div className="flex gap-3">
-              <IconPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#c05a2c]" />
-              <div>
-                <p className="text-xs uppercase tracking-wide text-[#16231f]/50">{t.location.addressLabel}</p>
-                <p className="text-sm text-[#16231f]/85">{ADDRESS}</p>
-              </div>
+      {/* ================= INSTAGRAM ================= */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <Reveal className="rounded-[2rem] p-10 sm:p-14 grid md:grid-cols-[1fr_auto] gap-8 items-center" style={{ background: "linear-gradient(120deg, var(--color-lagoon-mist), var(--color-sand-deep))" }}>
+            <div>
+              <p className="text-sm font-medium text-leaf">{t.instagram.kicker}</p>
+              <h2 className="font-display text-2xl sm:text-3xl mt-3 max-w-md">{t.instagram.title}</h2>
+              <p className="mt-3 text-ink-soft">
+                {INSTAGRAM_HANDLE} · <span className="font-medium text-ink">{INSTAGRAM_FOLLOWERS}</span> {t.instagram.followers}
+              </p>
             </div>
-            <div className="flex gap-3">
-              <IconChat className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#c05a2c]" />
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-ink text-sand px-6 py-3.5 font-medium hover:bg-ink/85 transition-colors justify-self-start md:justify-self-end shrink-0"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+              </svg>
+              {t.instagram.cta}
+            </a>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= LOCATION ================= */}
+      <section id="ubicacion" className="py-20 sm:py-28 bg-sand-deep">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 grid md:grid-cols-2 gap-10 items-start">
+          <Reveal>
+            <p className="text-sm font-medium text-leaf">{t.location.kicker}</p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.location.title}</h2>
+
+            <dl className="mt-8 space-y-6">
               <div>
-                <p className="text-xs uppercase tracking-wide text-[#16231f]/50">{t.location.phoneLabel}</p>
-                <p className="text-sm text-[#16231f]/85">{PHONE_DISPLAY}</p>
+                <dt className="text-sm text-ink-soft">{t.location.address}</dt>
+                <dd className="text-xs text-mango-deep mt-1">{t.location.addressNote}</dd>
               </div>
+              <div>
+                <dt className="text-sm text-ink-soft">{t.location.hours}</dt>
+                <dd className="text-xs text-mango-deep mt-1">{t.location.hoursNote}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-ink-soft">{PHONE_DISPLAY}</dt>
+              </div>
+            </dl>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-lagoon text-sand px-5 py-3 text-sm font-medium hover:bg-lagoon-deep transition-colors">
+                <WhatsAppIcon className="w-4 h-4" />
+                {t.location.whatsapp}
+              </a>
+              <a href={telHref} className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-3 text-sm font-medium hover:border-ink/40 transition-colors">
+                {t.location.phone}
+              </a>
+              <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-3 text-sm font-medium hover:border-ink/40 transition-colors">
+                {t.location.mapsCta}
+              </a>
+            </div>
+          </Reveal>
+
+          <Reveal delay={1} className="rounded-2xl overflow-hidden aspect-[4/3] bg-ink/5">
+            {/* DUMMY query — replace with the exact address once confirmed */}
+            <iframe
+              title="Sierra Campestre — Google Maps"
+              src="https://www.google.com/maps?q=Sierra+Campestre+Santa+Marta+Magdalena&output=embed"
+              className="w-full h-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= CTA BAND ================= */}
+      <section className="py-20 sm:py-24 text-center">
+        <div className="mx-auto max-w-2xl px-5 sm:px-8">
+          <Reveal>
+            <h2 className="font-display text-3xl sm:text-4xl">{t.ctaBand.title}</h2>
+            <p className="mt-3 text-ink-soft">{t.ctaBand.subtitle}</p>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-8 rounded-full bg-mango text-ink px-7 py-4 font-medium hover:bg-mango-deep transition-colors"
+            >
+              <WhatsAppIcon className="w-5 h-5" />
+              {t.ctaBand.cta}
+            </a>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="bg-ink text-sand/80 py-14">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 grid sm:grid-cols-[1fr_auto] gap-8 items-start">
+          <div>
+            <div className="flex items-center gap-2">
+              <MacawMark className="w-7 h-7" />
+              <span className="font-display text-lg text-sand">Sierra Campestre</span>
+            </div>
+            <p className="text-sm mt-3 max-w-xs">{t.footer.tagline}</p>
+            <div className="flex items-center gap-4 mt-5">
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-sand transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+                </svg>
+              </a>
+              <a href={waHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-sand transition-colors">
+                <WhatsAppIcon className="w-5 h-5" />
+              </a>
+              <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="hover:text-sand transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M12 21s-7-6.1-7-11a7 7 0 1114 0c0 4.9-7 11-7 11z" />
+                  <circle cx="12" cy="10" r="2.6" />
+                </svg>
+              </a>
             </div>
           </div>
 
-          <WhatsAppLink className="mt-8">{t.location.whatsappCta}</WhatsAppLink>
-        </div>
-
-        <div className="overflow-hidden rounded-3xl border border-[#16231f]/10">
-          <iframe
-            title="Google Maps"
-            src={MAP_EMBED_SRC}
-            className="h-72 w-full lg:h-full"
-            style={{ border: 0 }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ───────────────────────────── CTA band ───────────────────────────── */
-
-function CtaBand() {
-  const { t } = useLang();
-  return (
-    <section className="bg-[#0a3f3b] py-20 text-[#fbf5ea]">
-      <div className="mx-auto max-w-3xl px-5 text-center sm:px-8">
-        <h2 className="font-display text-3xl leading-tight sm:text-4xl">{t.cta.heading}</h2>
-        <p className="mt-4 text-[#fbf5ea]/75">{t.cta.body}</p>
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <WhatsAppLink variant="onDark">{t.cta.button}</WhatsAppLink>
-          <span className="text-sm text-[#fbf5ea]/60">{PHONE_DISPLAY}</span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ───────────────────────────── Footer ───────────────────────────── */
-
-function Footer() {
-  const { t } = useLang();
-  const links = [
-    ["#home", t.nav.home],
-    ["#about", t.nav.about],
-    ["#amenities", t.nav.amenities],
-    ["#gallery", t.nav.gallery],
-    ["#reviews", t.nav.reviews],
-    ["#location", t.nav.location],
-  ];
-  return (
-    <footer className="bg-[#f1e7d3] pb-10 pt-16">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:px-8 sm:grid-cols-3">
-        <div>
-          <p className="font-display text-xl text-[#0e5c55]">Casa Bahía</p>
-          <p className="mt-3 max-w-xs text-sm text-[#16231f]/65">{t.footer.tagline}</p>
-          {/* REPLACE: social links are placeholders */}
-          <div className="mt-4 flex gap-3 text-xs text-[#16231f]/50">
-            <a href="#" className="hover:text-[#0e5c55]">Instagram</a>
-            <a href="#" className="hover:text-[#0e5c55]">Facebook</a>
+          <div className="text-sm space-y-2">
+            <div>{PHONE_DISPLAY}</div>
+            <div>{t.location.address}</div>
           </div>
         </div>
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-[#16231f]/50">{t.footer.quickLinks}</p>
-          <ul className="mt-3 space-y-2">
-            {links.map(([href, label]) => (
-              <li key={href}><a href={href} className="text-sm text-[#16231f]/70 hover:text-[#0e5c55]">{label}</a></li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-[#16231f]/50">{t.footer.contact}</p>
-          <p className="mt-3 text-sm text-[#16231f]/70">{ADDRESS}</p>
-          <p className="mt-1 text-sm text-[#16231f]/70">{PHONE_DISPLAY}</p>
-        </div>
-      </div>
-      <p className="mx-auto mt-12 max-w-6xl px-5 text-xs text-[#16231f]/40 sm:px-8">
-        © {new Date().getFullYear()} Casa Bahía. {t.footer.rights}
-      </p>
-    </footer>
-  );
-}
 
-/* ───────────────────────────── App ───────────────────────────── */
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 mt-10 pt-6 border-t border-sand/10 text-xs text-sand/45 flex flex-col sm:flex-row gap-2 justify-between">
+          <span>© {new Date().getFullYear()} Sierra Campestre. {t.footer.rights}</span>
+          <span>{t.footer.madeNote}</span>
+        </div>
+      </footer>
 
-function Page() {
-  const { t } = useLang();
-  return (
-    <div className="bg-[#fbf5ea] text-[#16231f]">
-      <a href="#main" className="skip-link">{t.skip}</a>
-      <Header />
-      <main id="main">
-        <Hero />
-        <About />
-        <Amenities />
-        <Gallery />
-        <Reviews />
-        <Location />
-        <CtaBand />
-      </main>
-      <Footer />
+      {/* ================= WHATSAPP FLOATING WIDGET ================= */}
+      <a
+        href={waHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="wa-button fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-50 flex items-center"
+        aria-label={t.whatsapp.tooltip}
+      >
+        <span className="wa-tooltip mr-3 hidden sm:block bg-ink text-sand text-sm px-3.5 py-2 rounded-full whitespace-nowrap shadow-lg">
+          {t.whatsapp.tooltip}
+        </span>
+        <span className="relative w-14 h-14">
+          <span className="wa-ring" />
+          <span className="absolute inset-0 rounded-full bg-whatsapp flex items-center justify-center shadow-lg">
+            <WhatsAppIcon className="w-7 h-7 text-white" />
+          </span>
+        </span>
+      </a>
     </div>
-  );
-}
-
-export default function App() {
-  return (
-    <LangProvider>
-      <Page />
-    </LangProvider>
   );
 }

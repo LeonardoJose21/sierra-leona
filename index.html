@@ -1,64 +1,132 @@
 <!doctype html>
-<html lang="es-CO">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Kamaly Aventuras | Torrentismo y turismo extremo en Melgar, Tolima</title>
-    <meta name="description" content="Operador directo de turismo de aventura en Melgar, Tolima. Torrentismo, rappel en cascadas y logística para grupos, con guías locales y equipo certificado. Reserva por WhatsApp." />
-    <meta name="keywords" content="torrentismo Melgar, canyoning Tolima, rappel cascadas Melgar, turismo extremo Tolima, aventura Melgar, Kamaly Aventuras" />
-    <meta name="author" content="Kamaly Aventuras" />
+    <!-- ===== Primary SEO ===== -->
+    <title>Sierra Campestre | Pasadía, Hospedaje y Eventos en Santa Marta</title>
+    <meta
+      name="description"
+      content="Pasadía con piscina, hospedaje, restaurante y eventos campestres cerca de Santa Marta, Magdalena. Reserva por WhatsApp. Calificación 4.4★ en Google."
+    />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://www.kamalyaventuras.com/" />
+    <meta name="theme-color" content="#146c8e" />
+    <!-- DUMMY: replace with your real production domain before publishing -->
+    <link rel="canonical" href="https://www.sierracampestre.com/" />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    <!-- Best-effort language hints for a single-URL SPA. True per-language SEO
+         needs separate URLs (e.g. /en/); see note at bottom of this file. -->
+    <link rel="alternate" hreflang="es-co" href="https://www.sierracampestre.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.sierracampestre.com/" />
+
+    <!-- ===== Open Graph / social ===== -->
+    <meta property="og:type" content="business.business" />
+    <meta property="og:site_name" content="Sierra Campestre" />
+    <meta property="og:title" content="Sierra Campestre | Pasadía, Hospedaje y Eventos en Santa Marta" />
+    <meta
+      property="og:description"
+      content="Pasadía con piscina, hospedaje, restaurante y eventos campestres cerca de Santa Marta, Magdalena. Calificación 4.4★ en Google."
+    />
+    <!-- DUMMY: add a real 1200x630 image at public/og-image.jpg -->
+    <meta property="og:image" content="https://www.sierracampestre.com/og-image.jpg" />
     <meta property="og:locale" content="es_CO" />
-    <meta property="og:site_name" content="Kamaly Aventuras" />
-    <meta property="og:title" content="Kamaly Aventuras | Torrentismo y turismo extremo en Melgar, Tolima" />
-    <meta property="og:description" content="Vive el descenso de cascadas con guías locales y equipo certificado. Operador directo de turismo de aventura en Melgar, Tolima." />
-    <meta property="og:url" content="https://www.kamalyaventuras.com/" />
-    <meta property="og:image" content="https://www.kamalyaventuras.com/og-image.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:url" content="https://www.sierracampestre.com/" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Kamaly Aventuras | Torrentismo en Melgar, Tolima" />
-    <meta name="twitter:description" content="Operador directo de turismo de aventura en Melgar, Tolima. Reserva tu torrentismo por WhatsApp." />
-    <meta name="twitter:image" content="https://www.kamalyaventuras.com/og-image.jpg" />
+    <meta name="twitter:title" content="Sierra Campestre | Santa Marta" />
+    <meta name="twitter:description" content="Pasadía, hospedaje, restaurante y eventos cerca de Santa Marta, Magdalena." />
+    <meta name="twitter:image" content="https://www.sierracampestre.com/og-image.jpg" />
 
-    <!-- Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
-    <link rel="apple-touch-icon" href="/favicon-192.png" />
-    <meta name="theme-color" content="#0E1210" />
+    <!-- ===== Icons ===== -->
+    <!-- DUMMY: add a real favicon at public/favicon.svg -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <!-- Preconnect fonts are self-hosted via @fontsource, no external font requests -->
+    <!-- ===== Fonts: Fraunces (display) + Karla (body), loaded with preconnect + swap ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <!-- Structured data: local business -->
+    <!-- =====================================================================
+         JSON-LD structured data — kept static in index.html (not injected by
+         JS) so search engines can read it even before React hydrates.
+
+         DUMMY VALUES YOU MUST REPLACE:
+           - "url": production domain
+           - "address": exact street address (only city/department confirmed)
+           - "geo": approximate Santa Marta coordinates — replace with your
+             real lat/long
+           - "openingHoursSpecification": placeholder hours
+           - "priceRange": placeholder
+         REAL VALUES ALREADY FILLED IN:
+           - name, telephone, aggregateRating, review quotes + authors,
+             sameAs (Instagram + Google Business profile)
+       ===================================================================== -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SportsActivityLocation",
-      "name": "Kamaly Aventuras",
-      "alternateName": "Kamaly Operación Extrema",
-      "description": "Operador directo de ecoturismo y turismo de aventura: torrentismo, rappel en cascadas y logística para grupos en Melgar, Tolima, Colombia.",
-      "image": "https://www.kamalyaventuras.com/og-image.jpg",
-      "telephone": "+57-311-245-0226",
-      "priceRange": "$$",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Melgar",
-        "addressRegion": "Tolima",
-        "addressCountry": "CO"
-      },
-      "areaServed": {
-        "@type": "City",
-        "name": "Melgar"
-      },
-      "sameAs": []
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "LodgingBusiness",
+        "name": "Sierra Campestre",
+        "description": "Pasadía con piscina, hospedaje, restaurante y eventos campestres cerca de Santa Marta, Magdalena, Colombia.",
+        "url": "https://www.sierracampestre.com/",
+        "telephone": "+57 301 608 1833",
+        "priceRange": "$$",
+        "image": ["https://www.sierracampestre.com/og-image.jpg"],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Vereda El Campano",
+          "addressLocality": "Santa Marta",
+          "addressRegion": "Magdalena",
+          "addressCountry": "CO"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 11.2408,
+          "longitude": -74.199
+        },
+        "sameAs": ["https://www.instagram.com/sierra.campestre/", "https://share.google/ACfExejzW4hhLi1cB"],
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "09:00",
+          "closes": "18:00"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.4",
+          "reviewCount": "16"
+        },
+        "review": [
+          {
+            "@type": "Review",
+            "author": { "@type": "Person", "name": "Joseph A Villanueva Z" },
+            "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+            "reviewBody": "Es un buen sitio para compartir con familia y amigos, cerca de la ciudad, y con un excelente precio, la comida espectacular."
+          },
+          {
+            "@type": "Review",
+            "author": { "@type": "Person", "name": "MIGUEL ACOSTA R" },
+            "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+            "reviewBody": "Buen lugar para pasar en familia. Excelente atención."
+          },
+          {
+            "@type": "Review",
+            "author": { "@type": "Person", "name": "ricardo obando" },
+            "reviewRating": { "@type": "Rating", "ratingValue": "4" },
+            "reviewBody": "Buen sitio para pasar un día de descanso."
+          },
+          {
+            "@type": "Review",
+            "author": { "@type": "Person", "name": "Paula Mejía" },
+            "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+            "reviewBody": "Muy bueno! El sitio está muy bien organizado, muy limpio y bastante amplio. La piscina está súper, muy fresca y el almuerzo excelente!"
+          }
+        ]
+      }
     </script>
   </head>
   <body>

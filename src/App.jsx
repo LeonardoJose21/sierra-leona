@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { SERVICES_META } from "./data/serviceMeta";
+import Admin from "./pages/Admin";
+import { useSiteContent } from "./hooks/useSiteContent";
 
 /* =========================================================================
    SIERRA CAMPESTRE — landing page
@@ -29,6 +32,9 @@ import gallery5 from "./assets/gallery-5.png";
 import gallery6 from "./assets/gallery-6.png";
 import gallery7 from "./assets/gallery-7.png";
 import gallery8 from "./assets/gallery-8.png";
+import Carousel from "./components/Carousel";
+import InstagramEmbed from "./components/InstagramEmbed";
+import BookingWidget from "./components/BookingWidget";
 
 // ---- Business constants ----------------------------------------------------
 const PHONE_DISPLAY = "+57 301 608 1833";
@@ -78,19 +84,35 @@ const COPY = {
     title: "Sierra Campestre | Pasadía, Hospedaje y Eventos en Santa Marta",
     description:
       "Pasadía con piscina, hospedaje, restaurante y eventos campestres cerca de Santa Marta, Magdalena. Reserva por WhatsApp. Calificación 4.4★ en Google.",
-    nav: { about: "Nosotros", services: "Servicios", gallery: "Galería", reviews: "Opiniones", location: "Ubicación", book: "Reservar" },
+    nav: {
+      about: "Nosotros",
+      services: "Servicios",
+      gallery: "Galería",
+      reviews: "Opiniones",
+      location: "Ubicación",
+      book: "Reservar",
+    },
     hero: {
       pill: "Santa Marta, Magdalena",
       title: "Naturaleza, piscina y buena mesa a las puertas de Santa Marta.",
-      subtitle: "Pasadías, hospedaje, restaurante y eventos en medio del verde de la Sierra Nevada.",
+      subtitle:
+        "Pasadías, hospedaje, restaurante y eventos donde el verde de la Sierra se junta con la buena vibra costeña.",
       ctaPrimary: "Reservar por WhatsApp",
       ctaSecondary: "Ver el lugar",
     },
     stats: [
       { value: "4.4★", label: "en Google", sub: `${RATING_COUNT} reseñas` },
       { value: "6.4K+", label: "en Instagram", sub: "comunidad que nos sigue" },
-      { value: "4", label: "experiencias", sub: "pasadía, hospedaje, restaurante y eventos" }, // real count, not dummy
-      { value: "100%", label: "al aire libre", sub: "verde de la Sierra Nevada" },
+      {
+        value: "4",
+        label: "experiencias",
+        sub: "pasadía, hospedaje, restaurante y eventos",
+      }, // real count, not dummy
+      {
+        value: "100%",
+        label: "al aire libre",
+        sub: "verde de la Sierra Nevada",
+      },
     ],
     about: {
       kicker: "Quiénes somos",
@@ -104,23 +126,21 @@ const COPY = {
       items: [
         {
           name: "Pasadía",
-          desc: "Piscina, zonas verdes y sombra para pasar el día completo en familia.", // DUMMY: add price/hours
-          note: "Desde $ — DUMMY, confirmar tarifa",
+          desc: "Almuerzo incluido con 6 opciones de asado (carne, lomo, pechuga, pollo araña, loncha o carne oreada), más acceso a piscina, tirolesa, zonas verdes, cancha y columpios.",
+          note: "Adultos $45.000 · Niños de 4 a 10 años $25.000 (menú infantil incluido)",
+          ctaLabel: "Reservar pasadía",
         },
         {
           name: "Hospedaje",
-          desc: "Habitaciones y cabañas para quedarte una o varias noches.", // DUMMY
-          note: "Capacidad — DUMMY, confirmar",
-        },
-        {
-          name: "Restaurante",
-          desc: "Carnes a la parrilla y comida típica, con porciones generosas según nuestros visitantes.",
-          note: "Reservas para grupos grandes recomendadas",
+          desc: "Habitaciones para quedarte una o varias noches, con desayuno incluido en la de pareja.",
+          note: "Check-in 8:00 a.m. · Check-out 1:00 p.m.",
+          ctaLabel: "Elegir habitación",
         },
         {
           name: "Eventos",
-          desc: "Cumpleaños, matrimonios campestres y eventos empresariales en un entorno natural.", // DUMMY
-          note: "Capacidad para — DUMMY personas",
+          desc: "Cumpleaños, matrimonios campestres y eventos empresariales en un entorno natural.",
+          note: "Se cotiza según el evento — requiere reserva",
+          ctaLabel: "Cotizar mi evento",
         },
       ],
     },
@@ -128,7 +148,16 @@ const COPY = {
       kicker: "Galería",
       title: "Así se vive Sierra Campestre",
       // DUMMY captions — adjust to match your real photos
-      items: ["Zona central", "Zonas verdes y sombra", "Animalitos", "La parrilla", "Tirolesa", "Atardecer", "Piscina", "Área de relajación"],
+      items: [
+        "Zona central",
+        "Zonas verdes y sombra",
+        "Animalitos",
+        "La parrilla",
+        "Tirolesa",
+        "Atardecer",
+        "Piscina",
+        "Área de relajación",
+      ],
     },
     reviews: {
       kicker: "Opiniones reales",
@@ -155,16 +184,20 @@ const COPY = {
       mapsCta: "Ver en Google Maps",
     },
     ctaBand: {
-      title: "¿Listo para tu próxima escapada?",
+      title: "¿Listo pa' tu próxima escapada?",
       subtitle: "Cuéntanos qué planeas y te ayudamos a organizarlo.",
       cta: "Reservar por WhatsApp",
     },
     footer: {
       tagline: "Pasadía · Hospedaje · Restaurante · Eventos",
       rights: "Todos los derechos reservados.", // DUMMY year/legal name if different
-      madeNote: "Sitio en construcción — reemplaza los datos marcados como DUMMY antes de publicar.",
+      madeNote:
+        "Sitio en construcción — reemplaza los datos marcados como DUMMY antes de publicar.",
     },
-    whatsapp: { tooltip: "Escríbenos", message: "Hola, quiero más información sobre Sierra Campestre." },
+    whatsapp: {
+      tooltip: "Escríbenos",
+      message: "Hola, quiero más información sobre Sierra Campestre.",
+    },
     langSwitch: "English",
   },
   en: {
@@ -172,18 +205,30 @@ const COPY = {
     title: "Sierra Campestre | Day Trips, Lodging & Events in Santa Marta",
     description:
       "A pool day trip, lodging, restaurant and countryside events near Santa Marta, Colombia. Book on WhatsApp. Rated 4.4★ on Google.",
-    nav: { about: "About", services: "Services", gallery: "Gallery", reviews: "Reviews", location: "Location", book: "Book now" },
+    nav: {
+      about: "About",
+      services: "Services",
+      gallery: "Gallery",
+      reviews: "Reviews",
+      location: "Location",
+      book: "Book now",
+    },
     hero: {
       pill: "Santa Marta, Magdalena",
       title: "Nature, a pool and good food, minutes from Santa Marta.",
-      subtitle: "Day trips, lodging, restaurant and events surrounded by the green of the Sierra Nevada.",
+      subtitle:
+        "Day trips, lodging, restaurant and events surrounded by the green of the Sierra Nevada.",
       ctaPrimary: "Book on WhatsApp",
       ctaSecondary: "See the place",
     },
     stats: [
       { value: "4.4★", label: "on Google", sub: `${RATING_COUNT} reviews` },
       { value: "6.4K+", label: "on Instagram", sub: "community following us" },
-      { value: "4", label: "experiences", sub: "day trips, lodging, dining and events" },
+      {
+        value: "4",
+        label: "experiences",
+        sub: "day trips, lodging, dining and events",
+      },
       { value: "100%", label: "outdoors", sub: "in the Sierra Nevada green" },
     ],
     about: {
@@ -196,20 +241,39 @@ const COPY = {
       kicker: "What you'll find here",
       title: "Four ways to enjoy Sierra Campestre",
       items: [
-        { name: "Day pass", desc: "Pool, green areas and shade for a full family day.", note: "From $ — DUMMY, confirm rate" },
-        { name: "Lodging", desc: "Rooms and cabins for a night or a few.", note: "Capacity — DUMMY, confirm" },
         {
-          name: "Restaurant",
-          desc: "Grilled meats and local dishes, with generous portions according to our visitors.",
-          note: "Reservations recommended for large groups",
+          name: "Day pass",
+          desc: "Lunch included with a choice of 6 grilled proteins (beef, tenderloin, chicken breast, spider-cut chicken, thin-cut beef, or dried beef), plus access to the pool, zip line, green areas, soccer field and swings.",
+          note: "Adults $45,000 COP · Kids 4–10 $25,000 COP (kids' menu included)",
+          ctaLabel: "Book a day pass",
         },
-        { name: "Events", desc: "Birthdays, countryside weddings and corporate events in a natural setting.", note: "Capacity for — DUMMY people" },
+        {
+          name: "Lodging",
+          desc: "Rooms for a night or a few, with breakfast included in the couple's room.",
+          note: "Check-in 8:00 a.m. · Check-out 1:00 p.m.",
+          ctaLabel: "Choose a room",
+        },
+        {
+          name: "Events",
+          desc: "Birthdays, countryside weddings and corporate events in a natural setting.",
+          note: "Quoted per event — booking required",
+          ctaLabel: "Get an event quote",
+        },
       ],
     },
     gallery: {
       kicker: "Gallery",
       title: "This is Sierra Campestre",
-      items: ["Main area", "Green shaded areas", "Cute animals", "The grill", "Zip line", "Sunsets", "Swimming pool", "Relaxing area"], // DUMMY captions — adjust to match your real photos
+      items: [
+        "Main area",
+        "Green shaded areas",
+        "Cute animals",
+        "The grill",
+        "Zip line",
+        "Sunsets",
+        "Swimming pool",
+        "Relaxing area",
+      ], // DUMMY captions — adjust to match your real photos
     },
     reviews: {
       kicker: "Real reviews",
@@ -243,9 +307,13 @@ const COPY = {
     footer: {
       tagline: "Day trips · Lodging · Restaurant · Events",
       rights: "All rights reserved.",
-      madeNote: "Site under construction — replace anything marked DUMMY before publishing.",
+      madeNote:
+        "Site under construction — replace anything marked DUMMY before publishing.",
     },
-    whatsapp: { tooltip: "Chat with us", message: "Hi, I'd like more information about Sierra Campestre." },
+    whatsapp: {
+      tooltip: "Chat with us",
+      message: "Hi, I'd like more information about Sierra Campestre.",
+    },
     langSwitch: "Español",
   },
 };
@@ -267,7 +335,13 @@ function USFlag({ className }) {
     <svg viewBox="0 0 30 20" className={className} aria-hidden="true">
       <rect width="30" height="20" fill="#B22234" />
       {[...Array(6)].map((_, i) => (
-        <rect key={i} width="30" height="1.54" y={1.54 * (i * 2 + 1)} fill="#fff" />
+        <rect
+          key={i}
+          width="30"
+          height="1.54"
+          y={1.54 * (i * 2 + 1)}
+          fill="#fff"
+        />
       ))}
       <rect width="12" height="10.77" fill="#3C3B6E" />
     </svg>
@@ -282,9 +356,15 @@ function MacawMark({ className }) {
         d="M20 10C28 6 40 8 46 18C50 24 50 30 46 36L52 38C54 39 54 41 52 42L44 44C42 50 36 54 29 54C20 54 12 47 12 37C12 30 15 25 15 25C11 24 8 20 8 16C8 16 14 17 17 20C17 14 18 12 20 10Z"
         fill="var(--color-lagoon)"
       />
-      <path d="M29 54C24 54 19 51 16 47C19 49 24 50 28 49C33 48 36 44 37 40C39 44 39 49 35 52C33 53.5 31 54 29 54Z" fill="var(--color-mango)" />
+      <path
+        d="M29 54C24 54 19 51 16 47C19 49 24 50 28 49C33 48 36 44 37 40C39 44 39 49 35 52C33 53.5 31 54 29 54Z"
+        fill="var(--color-mango)"
+      />
       <circle cx="24" cy="20" r="2.4" fill="var(--color-sand)" />
-      <path d="M46 18C48 19 49 21 48 23C46 22 44 20 44 18C44.7 17.6 45.4 17.7 46 18Z" fill="var(--color-mango)" />
+      <path
+        d="M46 18C48 19 49 21 48 23C46 22 44 20 44 18C44.7 17.6 45.4 17.7 46 18Z"
+        fill="var(--color-mango)"
+      />
     </svg>
   );
 }
@@ -293,7 +373,14 @@ function Stars({ count, className = "" }) {
   return (
     <span className={`inline-flex gap-0.5 ${className}`} aria-hidden="true">
       {[...Array(5)].map((_, i) => (
-        <svg key={i} width="15" height="15" viewBox="0 0 20 20" className={i < count ? "star" : "text-ink/15"} fill="currentColor">
+        <svg
+          key={i}
+          width="15"
+          height="15"
+          viewBox="0 0 20 20"
+          className={i < count ? "star" : "text-ink/15"}
+          fill="currentColor"
+        >
           <path d="M10 1.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L1.3 7.7l6.1-.6L10 1.5z" />
         </svg>
       ))}
@@ -303,7 +390,12 @@ function Stars({ count, className = "" }) {
 
 function WhatsAppIcon({ className }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} fill="currentColor" aria-hidden="true">
+    <svg
+      viewBox="0 0 32 32"
+      className={className}
+      fill="currentColor"
+      aria-hidden="true"
+    >
       <path d="M16.02 3C9.4 3 4 8.36 4 15c0 2.34.66 4.53 1.8 6.4L4 29l7.8-1.76A11.9 11.9 0 0016.02 27C22.65 27 28 21.65 28 15S22.65 3 16.02 3zm0 21.8c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.18.94 1-4.05-.26-.4A9.7 9.7 0 016.2 15c0-5.4 4.4-9.8 9.82-9.8 5.42 0 9.82 4.4 9.82 9.8s-4.4 9.8-9.82 9.8z" />
       <path d="M21.2 17.72c-.28-.14-1.66-.82-1.92-.91-.26-.1-.44-.14-.63.14-.19.28-.72.91-.88 1.1-.16.19-.32.2-.6.07-.28-.14-1.17-.43-2.23-1.38-.82-.73-1.38-1.63-1.54-1.91-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.5-.07-.14-.63-1.53-.87-2.1-.23-.55-.46-.47-.63-.48-.16-.01-.35-.01-.54-.01-.19 0-.5.07-.76.35-.26.28-1 1-1 2.42 0 1.43 1.02 2.82 1.16 3.01.14.19 2 3.06 4.85 4.29.68.29 1.2.47 1.62.6.68.22 1.3.19 1.79.11.55-.08 1.66-.68 1.9-1.33.23-.66.23-1.22.16-1.33-.06-.12-.25-.19-.53-.33z" />
     </svg>
@@ -323,7 +415,7 @@ function useReveal() {
           obs.unobserve(el);
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -349,6 +441,17 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const t = COPY[lang];
 
+  const [route, setRoute] = useState(window.location.hash);
+  const [content] = useSiteContent();
+
+  useEffect(() => {
+    const onHash = () => setRoute(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  if (route === "#/admin") return <Admin />;
+
   useEffect(() => {
     document.documentElement.lang = t.htmlLang;
     document.title = t.title;
@@ -368,7 +471,10 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const toggleLang = useCallback(() => setLang((l) => (l === "es" ? "en" : "es")), []);
+  const toggleLang = useCallback(
+    () => setLang((l) => (l === "es" ? "en" : "es")),
+    [],
+  );
 
   const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.whatsapp.message)}`;
   const telHref = `tel:+${WHATSAPP_NUMBER}`;
@@ -381,25 +487,42 @@ export default function App() {
     { href: "#ubicacion", label: t.nav.location },
   ];
 
-  const galleryImages = [gallery1, gallery2, gallery3, gallery4, gallery5, gallery6, gallery7, gallery8];
+  const galleryImages = [
+    gallery1,
+    gallery2,
+    gallery3,
+    gallery4,
+    gallery5,
+    gallery6,
+    gallery7,
+    gallery8,
+  ];
 
   return (
     <div className="bg-sand text-ink font-body">
       {/* ================= HEADER ================= */}
       <header
         className={`site-header fixed top-0 inset-x-0 z-40 border-b ${
-          scrolled ? "bg-sand/90 backdrop-blur border-ink/10 shadow-[0_1px_0_rgba(0,0,0,0.02)]" : "bg-transparent border-transparent"
+          scrolled
+            ? "bg-sand/90 backdrop-blur border-ink/10 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+            : "bg-transparent border-transparent"
         }`}
       >
         <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#inicio" className="flex items-center gap-2 shrink-0">
             <MacawMark className="w-8 h-8" />
-            <span className="font-display text-lg text-ink">Sierra Campestre</span>
+            <span className="font-display text-lg text-ink">
+              Sierra Campestre
+            </span>
           </a>
 
           <nav className="hidden md:flex items-center gap-7 text-[0.94rem] text-ink-soft">
             {navItems.map((item) => (
-              <a key={item.href} href={item.href} className="link-underline hover:text-ink transition-colors">
+              <a
+                key={item.href}
+                href={item.href}
+                className="link-underline hover:text-ink transition-colors"
+              >
                 {item.label}
               </a>
             ))}
@@ -411,7 +534,11 @@ export default function App() {
               className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm hover:border-ink/30 transition-colors"
               aria-label={`Switch language — ${t.langSwitch}`}
             >
-              {lang === "es" ? <USFlag className="w-5 h-3.5 rounded-[2px]" /> : <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />}
+              {lang === "es" ? (
+                <USFlag className="w-5 h-3.5 rounded-[2px]" />
+              ) : (
+                <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />
+              )}
               {t.langSwitch}
             </button>
             <a
@@ -430,8 +557,19 @@ export default function App() {
             aria-label="Menu"
             aria-expanded={menuOpen}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              {menuOpen ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              )}
             </svg>
           </button>
         </div>
@@ -439,22 +577,41 @@ export default function App() {
         {/* Mobile menu */}
         <div
           className={`mobile-menu md:hidden overflow-hidden ${
-            menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+            menuOpen
+              ? "max-h-96 opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none"
           }`}
           style={{ transitionProperty: "max-height, opacity" }}
         >
           <div className="px-5 pb-6 pt-2 flex flex-col gap-4 bg-sand border-b border-ink/10">
             {navItems.map((item) => (
-              <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className="text-ink-soft text-base">
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="text-ink-soft text-base"
+              >
                 {item.label}
               </a>
             ))}
             <div className="flex items-center gap-3 pt-2">
-              <button onClick={toggleLang} className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm">
-                {lang === "es" ? <USFlag className="w-5 h-3.5 rounded-[2px]" /> : <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />}
+              <button
+                onClick={toggleLang}
+                className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm"
+              >
+                {lang === "es" ? (
+                  <USFlag className="w-5 h-3.5 rounded-[2px]" />
+                ) : (
+                  <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />
+                )}
                 {t.langSwitch}
               </button>
-              <a href={waHref} target="_blank" rel="noopener noreferrer" className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium">
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium"
+              >
                 {t.nav.book}
               </a>
             </div>
@@ -467,18 +624,33 @@ export default function App() {
         <div className="relative h-[86vh] min-h-[560px] max-h-[840px] overflow-hidden">
           <img
             src={heroImg}
-            alt={lang === "es" ? "Piscina y zona verde de Sierra Campestre en Santa Marta" : "Sierra Campestre pool and green grounds in Santa Marta"}
+            alt={
+              lang === "es"
+                ? "Piscina y zona verde de Sierra Campestre en Santa Marta"
+                : "Sierra Campestre pool and green grounds in Santa Marta"
+            }
             className="absolute inset-0 w-full h-full object-cover"
             fetchpriority="high"
           />
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(180deg, rgba(11,66,88,0.28) 0%, rgba(11,66,88,0.12) 40%, rgba(22,48,42,0.82) 100%)" }}
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(11,66,88,0.28) 0%, rgba(11,66,88,0.12) 40%, rgba(22,48,42,0.82) 100%)",
+            }}
           />
 
           <div className="relative h-full mx-auto max-w-6xl px-5 sm:px-8 flex flex-col justify-end pb-14 sm:pb-20">
             <div className="inline-flex items-center gap-2 self-start rounded-full bg-sand/90 backdrop-blur px-3.5 py-1.5 mb-6 text-sm text-ink-soft">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-lagoon">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="text-lagoon"
+              >
                 <path d="M12 21s-7-6.1-7-11a7 7 0 1114 0c0 4.9-7 11-7 11z" />
                 <circle cx="12" cy="10" r="2.6" />
               </svg>
@@ -488,7 +660,9 @@ export default function App() {
             <h1 className="font-display text-sand text-[2.6rem] sm:text-6xl lg:text-[4.5rem] leading-[1.02] max-w-3xl">
               {t.hero.title}
             </h1>
-            <p className="mt-5 text-sand/90 text-lg sm:text-xl max-w-xl leading-relaxed">{t.hero.subtitle}</p>
+            <p className="mt-5 text-sand/90 text-lg sm:text-xl max-w-xl leading-relaxed">
+              {t.hero.subtitle}
+            </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a
@@ -505,7 +679,14 @@ export default function App() {
                 className="inline-flex items-center gap-2 rounded-full border border-sand/50 text-sand px-6 py-3.5 font-medium hover:bg-sand/10 transition-colors"
               >
                 {t.hero.ctaSecondary}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 5v14M5 12l7 7 7-7" />
                 </svg>
               </a>
@@ -517,8 +698,13 @@ export default function App() {
         <div className="bg-lagoon-deep text-sand">
           <div className="mx-auto max-w-6xl px-5 sm:px-8 py-7 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
             {t.stats.map((s, i) => (
-              <div key={i} className={i > 0 ? "border-l border-sand/15 pl-6 sm:pl-8" : ""}>
-                <div className="font-display text-2xl sm:text-3xl text-mango">{s.value}</div>
+              <div
+                key={i}
+                className={i > 0 ? "border-l border-sand/15 pl-6 sm:pl-8" : ""}
+              >
+                <div className="font-display text-2xl sm:text-3xl text-mango">
+                  {s.value}
+                </div>
                 <div className="text-sm text-sand/90 mt-1">{s.label}</div>
                 <div className="text-xs text-sand/55 mt-0.5">{s.sub}</div>
               </div>
@@ -532,8 +718,12 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <Reveal className="order-2 md:order-1">
             <p className="text-sm font-medium text-leaf">{t.about.kicker}</p>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3 max-w-md">{t.about.title}</h2>
-            <p className="mt-6 text-ink-soft leading-relaxed max-w-md">{t.about.body}</p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3 max-w-md">
+              {t.about.title}
+            </h2>
+            <p className="mt-6 text-ink-soft leading-relaxed max-w-md">
+              {t.about.body}
+            </p>
             <a
               href={waHref}
               target="_blank"
@@ -541,7 +731,14 @@ export default function App() {
               className="inline-flex items-center gap-2 mt-8 text-lagoon font-medium link-underline"
             >
               {t.about.cta}
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
@@ -550,7 +747,11 @@ export default function App() {
             <div className="relative aspect-[4/5] rounded-[1.75rem] overflow-hidden">
               <img
                 src={aboutImg}
-                alt={lang === "es" ? "Zona de sombra y mesas en Sierra Campestre" : "Shaded seating area at Sierra Campestre"}
+                alt={
+                  lang === "es"
+                    ? "Zona de sombra y mesas en Sierra Campestre"
+                    : "Shaded seating area at Sierra Campestre"
+                }
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
@@ -564,25 +765,80 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <Reveal className="max-w-lg">
             <p className="text-sm font-medium text-leaf">{t.services.kicker}</p>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.services.title}</h2>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">
+              {t.services.title}
+            </h2>
           </Reveal>
 
-          <div className="mt-12 grid sm:grid-cols-2 gap-px bg-ink/10 rounded-2xl overflow-hidden">
+          <div className="mt-12 grid sm:grid-cols-3 gap-px bg-ink/10 rounded-2xl overflow-hidden">
             {t.services.items.map((item, i) => (
-              <Reveal key={item.name} delay={(i % 2) + 1} className="bg-sand-deep p-8 sm:p-10">
-                <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center"
-                  style={{ background: i % 2 === 0 ? "var(--color-lagoon-mist)" : "rgba(237,166,59,0.16)" }}
-                >
-                  <span className="font-display text-lg" style={{ color: i % 2 === 0 ? "var(--color-lagoon)" : "var(--color-mango-deep)" }}>
-                    {item.name.charAt(0)}
-                  </span>
+              <Reveal
+                key={item.name}
+                delay={(i % 2) + 1}
+                className="bg-sand-deep overflow-hidden group"
+              >
+                <div className="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={SERVICES_META[i].image}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-transform duration-500 ease-[var(--ease-out-strong)] group-hover:scale-105"
+                    loading="lazy"
+                  />
                 </div>
-                <h3 className="font-display text-xl mt-5">{item.name}</h3>
-                <p className="mt-2.5 text-ink-soft leading-relaxed">{item.desc}</p>
-                <p className="mt-4 text-xs text-ink-soft/70 italic">{item.note}</p>
+                <div className="p-8 sm:p-10">
+                  <h3 className="font-display text-xl">{item.name}</h3>
+                  <p className="mt-2.5 text-ink-soft leading-relaxed">
+                    {item.desc}
+                  </p>
+                  <p className="mt-4 text-xs text-ink-soft/70 italic">
+                    {item.note}
+                  </p>
+                  <a
+                    href={SERVICES_META[i].ctaHref}
+                    className="inline-flex items-center gap-2 mt-6 text-lagoon font-medium link-underline"
+                  >
+                    {item.ctaLabel}
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </a>
+                </div>
               </Reveal>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="reserva" className="py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <Reveal className="max-w-lg">
+            <p className="text-sm font-medium text-leaf">
+              {lang === "es" ? "Reserva de una vez" : "Book right now"}
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">
+              {lang === "es" ? "Dinos qué necesitas" : "Tell us what you need"}
+            </h2>
+          </Reveal>
+          <div className="mt-10 grid md:grid-cols-2 gap-6">
+            <Reveal delay={1} id="reserva-hospedaje">
+              <h3 className="font-display text-lg mb-3">
+                {lang === "es" ? "Hospedaje" : "Lodging"}
+              </h3>
+              <BookingWidget mode="room" rooms={content.rooms} lang={lang} />
+            </Reveal>
+            <Reveal delay={2} id="reserva-evento">
+              <h3 className="font-display text-lg mb-3">
+                {lang === "es" ? "Eventos" : "Events"}
+              </h3>
+              <BookingWidget mode="event" lang={lang} />
+            </Reveal>
           </div>
         </div>
       </section>
@@ -592,15 +848,17 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <Reveal className="max-w-lg">
             <p className="text-sm font-medium text-leaf">{t.gallery.kicker}</p>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.gallery.title}</h2>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">
+              {t.gallery.title}
+            </h2>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+          <Carousel className="mt-12">
             {galleryImages.map((src, i) => (
-              <Reveal
+              <div
                 key={i}
-                delay={(i % 4) + 1}
-                className={`relative overflow-hidden rounded-xl ${i === 0 ? "col-span-2 row-span-2 aspect-square md:aspect-auto" : "aspect-square"}`}
+                data-carousel-item
+                className="snap-start shrink-0 w-[78%] sm:w-[380px] relative overflow-hidden rounded-xl aspect-[4/3]"
               >
                 <img
                   src={src}
@@ -611,31 +869,64 @@ export default function App() {
                 <span className="absolute bottom-2.5 left-2.5 text-xs text-sand bg-ink/45 backdrop-blur px-2.5 py-1 rounded-full">
                   {t.gallery.items[i]}
                 </span>
-              </Reveal>
+              </div>
             ))}
-          </div>
+          </Carousel>
+        </div>
+      </section>
+
+      <section className="py-20 sm:py-24 bg-sand-deep">
+        <div className="mx-auto max-w-2xl px-5 sm:px-8 text-center">
+          <Reveal>
+            <p className="text-sm font-medium text-leaf">
+              {lang === "es" ? "Míralo en video" : "See it in motion"}
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">
+              {lang === "es"
+                ? "Así se vive un día en Sierra Campestre"
+                : "This is a day at Sierra Campestre"}
+            </h2>
+          </Reveal>
+          <Reveal delay={1} className="mt-10">
+            <InstagramEmbed url={content.instagramReelUrl} />
+          </Reveal>
         </div>
       </section>
 
       {/* ================= REVIEWS ================= */}
-      <section id="opiniones" className="py-20 sm:py-28 bg-lagoon-deep text-sand">
+      <section
+        id="opiniones"
+        className="py-20 sm:py-28 bg-lagoon-deep text-sand"
+      >
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <Reveal className="max-w-lg">
             <p className="text-sm font-medium text-mango">{t.reviews.kicker}</p>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.reviews.title}</h2>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">
+              {t.reviews.title}
+            </h2>
             <div className="flex items-center gap-2 mt-4">
               <Stars count={4} />
-              <span className="text-sm text-sand/80">{t.reviews.ratingLabel}</span>
+              <span className="text-sm text-sand/80">
+                {t.reviews.ratingLabel}
+              </span>
             </div>
           </Reveal>
 
-          <div className="mt-12 grid sm:grid-cols-2 gap-5">
+          <Carousel className="mt-12" autoPlayMs={5200}>
             {REVIEWS.map((r, i) => (
-              <Reveal key={r.name} delay={(i % 2) + 1} className="bg-sand/[0.06] border border-sand/15 rounded-2xl p-7">
+              <div
+                key={r.name}
+                data-carousel-item
+                className="snap-start shrink-0 w-[85%] sm:w-[400px] bg-sand/[0.06] border border-sand/15 rounded-2xl p-7"
+              >
                 <Stars count={r.stars} />
-                <p className="mt-4 text-sand/95 leading-relaxed text-[0.97rem]">"{lang === "es" ? r.es : r.en}"</p>
+                <p className="mt-4 text-sand/95 leading-relaxed text-[0.97rem]">
+                  "{lang === "es" ? r.es : r.en}"
+                </p>
                 <div className="mt-6 flex items-center justify-between">
-                  <span className="text-sm font-medium text-sand/85">{r.name}</span>
+                  <span className="text-sm font-medium text-sand/85">
+                    {r.name}
+                  </span>
                   <a
                     href={r.url}
                     target="_blank"
@@ -645,14 +936,26 @@ export default function App() {
                     {t.reviews.seeThis}
                   </a>
                 </div>
-              </Reveal>
+              </div>
             ))}
-          </div>
+          </Carousel>
 
           <div className="mt-10 text-center">
-            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sand font-medium link-underline">
+            <a
+              href={GOOGLE_PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sand font-medium link-underline"
+            >
               {t.reviews.seeAll}
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
@@ -663,12 +966,26 @@ export default function App() {
       {/* ================= INSTAGRAM ================= */}
       <section className="py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <Reveal className="rounded-[2rem] p-10 sm:p-14 grid md:grid-cols-[1fr_auto] gap-8 items-center" style={{ background: "linear-gradient(120deg, var(--color-lagoon-mist), var(--color-sand-deep))" }}>
+          <Reveal
+            className="rounded-[2rem] p-10 sm:p-14 grid md:grid-cols-[1fr_auto] gap-8 items-center"
+            style={{
+              background:
+                "linear-gradient(120deg, var(--color-lagoon-mist), var(--color-sand-deep))",
+            }}
+          >
             <div>
-              <p className="text-sm font-medium text-leaf">{t.instagram.kicker}</p>
-              <h2 className="font-display text-2xl sm:text-3xl mt-3 max-w-md">{t.instagram.title}</h2>
+              <p className="text-sm font-medium text-leaf">
+                {t.instagram.kicker}
+              </p>
+              <h2 className="font-display text-2xl sm:text-3xl mt-3 max-w-md">
+                {t.instagram.title}
+              </h2>
               <p className="mt-3 text-ink-soft">
-                {INSTAGRAM_HANDLE} · <span className="font-medium text-ink">{INSTAGRAM_FOLLOWERS}</span> {t.instagram.followers}
+                {INSTAGRAM_HANDLE} ·{" "}
+                <span className="font-medium text-ink">
+                  {INSTAGRAM_FOLLOWERS}
+                </span>{" "}
+                {t.instagram.followers}
               </p>
             </div>
             <a
@@ -677,10 +994,23 @@ export default function App() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-ink text-sand px-6 py-3.5 font-medium hover:bg-ink/85 transition-colors justify-self-start md:justify-self-end shrink-0"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
                 <rect x="3" y="3" width="18" height="18" rx="5" />
                 <circle cx="12" cy="12" r="4" />
-                <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+                <circle
+                  cx="17.2"
+                  cy="6.8"
+                  r="1"
+                  fill="currentColor"
+                  stroke="none"
+                />
               </svg>
               {t.instagram.cta}
             </a>
@@ -693,16 +1023,22 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 grid md:grid-cols-2 gap-10 items-start">
           <Reveal>
             <p className="text-sm font-medium text-leaf">{t.location.kicker}</p>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3">{t.location.title}</h2>
+            <h2 className="font-display text-3xl sm:text-4xl mt-3">
+              {t.location.title}
+            </h2>
 
             <dl className="mt-8 space-y-6">
               <div>
                 <dt className="text-sm text-ink-soft">{t.location.address}</dt>
-                <dd className="text-xs text-mango-deep mt-1">{t.location.addressNote}</dd>
+                <dd className="text-xs text-mango-deep mt-1">
+                  {t.location.addressNote}
+                </dd>
               </div>
               <div>
                 <dt className="text-sm text-ink-soft">{t.location.hours}</dt>
-                <dd className="text-xs text-mango-deep mt-1">{t.location.hoursNote}</dd>
+                <dd className="text-xs text-mango-deep mt-1">
+                  {t.location.hoursNote}
+                </dd>
               </div>
               <div>
                 <dt className="text-sm text-ink-soft">{PHONE_DISPLAY}</dt>
@@ -710,20 +1046,36 @@ export default function App() {
             </dl>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={waHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-lagoon text-sand px-5 py-3 text-sm font-medium hover:bg-lagoon-deep transition-colors">
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-lagoon text-sand px-5 py-3 text-sm font-medium hover:bg-lagoon-deep transition-colors"
+              >
                 <WhatsAppIcon className="w-4 h-4" />
                 {t.location.whatsapp}
               </a>
-              <a href={telHref} className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-3 text-sm font-medium hover:border-ink/40 transition-colors">
+              <a
+                href={telHref}
+                className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-3 text-sm font-medium hover:border-ink/40 transition-colors"
+              >
                 {t.location.phone}
               </a>
-              <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-3 text-sm font-medium hover:border-ink/40 transition-colors">
+              <a
+                href={GOOGLE_PROFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-5 py-3 text-sm font-medium hover:border-ink/40 transition-colors"
+              >
                 {t.location.mapsCta}
               </a>
             </div>
           </Reveal>
 
-          <Reveal delay={1} className="rounded-2xl overflow-hidden aspect-[4/3] bg-ink/5">
+          <Reveal
+            delay={1}
+            className="rounded-2xl overflow-hidden aspect-[4/3] bg-ink/5"
+          >
             {/* DUMMY query — replace with the exact address once confirmed */}
             <iframe
               title="Sierra Campestre — Google Maps"
@@ -740,7 +1092,9 @@ export default function App() {
       <section className="py-20 sm:py-24 text-center">
         <div className="mx-auto max-w-2xl px-5 sm:px-8">
           <Reveal>
-            <h2 className="font-display text-3xl sm:text-4xl">{t.ctaBand.title}</h2>
+            <h2 className="font-display text-3xl sm:text-4xl">
+              {t.ctaBand.title}
+            </h2>
             <p className="mt-3 text-ink-soft">{t.ctaBand.subtitle}</p>
             <a
               href={waHref}
@@ -761,22 +1115,62 @@ export default function App() {
           <div>
             <div className="flex items-center gap-2">
               <MacawMark className="w-7 h-7" />
-              <span className="font-display text-lg text-sand">Sierra Campestre</span>
+              <span className="font-display text-lg text-sand">
+                Sierra Campestre
+              </span>
             </div>
             <p className="text-sm mt-3 max-w-xs">{t.footer.tagline}</p>
             <div className="flex items-center gap-4 mt-5">
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-sand transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="hover:text-sand transition-colors"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                >
                   <rect x="3" y="3" width="18" height="18" rx="5" />
                   <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+                  <circle
+                    cx="17.2"
+                    cy="6.8"
+                    r="1"
+                    fill="currentColor"
+                    stroke="none"
+                  />
                 </svg>
               </a>
-              <a href={waHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-sand transition-colors">
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="hover:text-sand transition-colors"
+              >
                 <WhatsAppIcon className="w-5 h-5" />
               </a>
-              <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label="Google Maps" className="hover:text-sand transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <a
+                href={GOOGLE_PROFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Google Maps"
+                className="hover:text-sand transition-colors"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                >
                   <path d="M12 21s-7-6.1-7-11a7 7 0 1114 0c0 4.9-7 11-7 11z" />
                   <circle cx="12" cy="10" r="2.6" />
                 </svg>
@@ -791,7 +1185,9 @@ export default function App() {
         </div>
 
         <div className="mx-auto max-w-6xl px-5 sm:px-8 mt-10 pt-6 border-t border-sand/10 text-xs text-sand/45 flex flex-col sm:flex-row gap-2 justify-between">
-          <span>© {new Date().getFullYear()} Sierra Campestre. {t.footer.rights}</span>
+          <span>
+            © {new Date().getFullYear()} Sierra Campestre. {t.footer.rights}
+          </span>
           <span>{t.footer.madeNote}</span>
         </div>
       </footer>

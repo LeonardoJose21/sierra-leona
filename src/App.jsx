@@ -2,23 +2,11 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { SERVICES_META } from "./data/serviceMeta";
 import Admin from "./pages/Admin";
 import { useSiteContent } from "./hooks/useSiteContent";
-
-/* =========================================================================
-   SIERRA CAMPESTRE — landing page
-   -------------------------------------------------------------------------
-   Real data used below (from the brief):
-     - Google rating: 4.4 (16 reviews)
-     - Google Business profile: https://share.google/ACfExejzW4hhLi1cB
-     - Phone: 301 608 1833 (Colombian mobile, assumed +57 country code)
-     - City: Santa Marta, Magdalena, Colombia
-     - Instagram: @sierra.campestre — 6,424 followers, 143 posts
-     - The 4 Google reviews quoted verbatim, each linked to its source
-
-   Everything else (exact address, coordinates, hours, prices, capacity,
-   founding year, gallery captions) is placeholder content clearly marked
-   with a "DUMMY" comment — search "DUMMY" to find every spot that needs
-   your real data before you ship this.
-   ========================================================================= */
+import Modal from "./components/Modal";
+import { money, formatPhoneCO, formatFollowers } from "./utils/format";
+import LangSwitch from "./components/LangSwitch"
+import YouTubeEmbed from "./components/YouTubeEmbed";
+import { parseYouTubeId } from "./utils/youtube";
 
 // ---- Replace these with your own images from src/assets -------------------
 // Drop files with these exact names in src/assets, or edit the paths below.
@@ -33,18 +21,14 @@ import gallery6 from "./assets/gallery-6.png";
 import gallery7 from "./assets/gallery-7.png";
 import gallery8 from "./assets/gallery-8.png";
 import Carousel from "./components/Carousel";
-import InstagramEmbed from "./components/InstagramEmbed";
 import BookingWidget from "./components/BookingWidget";
+import { COPY } from "./Copy";
 
 // ---- Business constants ----------------------------------------------------
 const PHONE_DISPLAY = "+57 301 608 1833";
-const WHATSAPP_NUMBER = "573016081833"; // DUMMY country code assumption — confirm +57
 const GOOGLE_PROFILE_URL = "https://share.google/ACfExejzW4hhLi1cB";
 const INSTAGRAM_URL = "https://www.instagram.com/sierra.campestre/";
 const INSTAGRAM_HANDLE = "@sierra.campestre";
-const INSTAGRAM_FOLLOWERS = "6,424";
-const RATING = 4.4;
-const RATING_COUNT = 16;
 
 const REVIEWS = [
   {
@@ -77,276 +61,7 @@ const REVIEWS = [
   },
 ];
 
-// ---- i18n -------------------------------------------------------------------
-const COPY = {
-  es: {
-    htmlLang: "es",
-    title: "Sierra Campestre | Pasadía, Hospedaje y Eventos en Santa Marta",
-    description:
-      "Pasadía con piscina, hospedaje, restaurante y eventos campestres cerca de Santa Marta, Magdalena. Reserva por WhatsApp. Calificación 4.4★ en Google.",
-    nav: {
-      about: "Nosotros",
-      services: "Servicios",
-      gallery: "Galería",
-      reviews: "Opiniones",
-      location: "Ubicación",
-      book: "Reservar",
-    },
-    hero: {
-      pill: "Santa Marta, Magdalena",
-      title: "Naturaleza, piscina y buena mesa a las puertas de Santa Marta.",
-      subtitle:
-        "Pasadías, hospedaje, restaurante y eventos donde el verde de la Sierra se junta con la buena vibra costeña.",
-      ctaPrimary: "Reservar por WhatsApp",
-      ctaSecondary: "Ver el lugar",
-    },
-    stats: [
-      { value: "4.4★", label: "en Google", sub: `${RATING_COUNT} reseñas` },
-      { value: "6.4K+", label: "en Instagram", sub: "comunidad que nos sigue" },
-      {
-        value: "4",
-        label: "experiencias",
-        sub: "pasadía, hospedaje, restaurante y eventos",
-      }, // real count, not dummy
-      {
-        value: "100%",
-        label: "al aire libre",
-        sub: "verde de la Sierra Nevada",
-      },
-    ],
-    about: {
-      kicker: "Quiénes somos",
-      title: "Un espacio verde para desconectarse de verdad.",
-      body: "Sierra Campestre es una finca campestre a minutos de Santa Marta, pensada para bajar el ritmo: piscina, sombra de árboles grandes, comida casera y el paso tranquilo del campo. Ya sea un pasadía en familia, un fin de semana de hospedaje o un evento especial, aquí el punto de partida es siempre el mismo: naturaleza de verdad.", // DUMMY: replace with real history/founding story
-      cta: "Escríbenos por WhatsApp",
-    },
-    services: {
-      kicker: "Qué encuentras aquí",
-      title: "Cuatro formas de disfrutar Sierra Campestre",
-      items: [
-        {
-          name: "Pasadía",
-          desc: "Almuerzo incluido con 6 opciones de asado (carne, lomo, pechuga, pollo araña, loncha o carne oreada), más acceso a piscina, tirolesa, zonas verdes, cancha y columpios.",
-          note: "Adultos $45.000 · Niños de 4 a 10 años $25.000 (menú infantil incluido)",
-          ctaLabel: "Reservar pasadía",
-        },
-        {
-          name: "Hospedaje",
-          desc: "Habitaciones para quedarte una o varias noches, con desayuno incluido en la de pareja.",
-          note: "Check-in 8:00 a.m. · Check-out 1:00 p.m.",
-          ctaLabel: "Elegir habitación",
-        },
-        {
-          name: "Eventos",
-          desc: "Cumpleaños, matrimonios campestres y eventos empresariales en un entorno natural.",
-          note: "Se cotiza según el evento — requiere reserva",
-          ctaLabel: "Cotizar mi evento",
-        },
-      ],
-    },
-    gallery: {
-      kicker: "Galería",
-      title: "Así se vive Sierra Campestre",
-      // DUMMY captions — adjust to match your real photos
-      items: [
-        "Zona central",
-        "Zonas verdes y sombra",
-        "Animalitos",
-        "La parrilla",
-        "Tirolesa",
-        "Atardecer",
-        "Piscina",
-        "Área de relajación",
-      ],
-    },
-    reviews: {
-      kicker: "Opiniones reales",
-      title: "Lo que dicen quienes ya vinieron",
-      ratingLabel: `${RATING} de 5 · ${RATING_COUNT} reseñas en Google`,
-      seeAll: "Ver todas las reseñas en Google",
-      seeThis: "Ver esta reseña en Google",
-    },
-    instagram: {
-      kicker: "Síguenos",
-      title: "Vive la naturaleza, relájate y disfruta con nosotros",
-      followers: "seguidores",
-      cta: "Seguir en Instagram",
-    },
-    location: {
-      kicker: "Cómo llegar",
-      title: "Te esperamos en Santa Marta",
-      address: "Vereda El Campano, Santa Marta, Magdalena", // DUMMY: replace with exact address
-      addressNote: "Dirección exacta pendiente de confirmar",
-      hours: "Todos los días, 9:00 a.m. – 6:00 p.m.", // DUMMY
-      hoursNote: "Horario de referencia — confirmar",
-      phone: "Llamar",
-      whatsapp: "Escribir por WhatsApp",
-      mapsCta: "Ver en Google Maps",
-    },
-    ctaBand: {
-      title: "¿Listo pa' tu próxima escapada?",
-      subtitle: "Cuéntanos qué planeas y te ayudamos a organizarlo.",
-      cta: "Reservar por WhatsApp",
-    },
-    footer: {
-      tagline: "Pasadía · Hospedaje · Restaurante · Eventos",
-      rights: "Todos los derechos reservados.", // DUMMY year/legal name if different
-      madeNote:
-        "Sitio en construcción — reemplaza los datos marcados como DUMMY antes de publicar.",
-    },
-    whatsapp: {
-      tooltip: "Escríbenos",
-      message: "Hola, quiero más información sobre Sierra Campestre.",
-    },
-    langSwitch: "English",
-  },
-  en: {
-    htmlLang: "en",
-    title: "Sierra Campestre | Day Trips, Lodging & Events in Santa Marta",
-    description:
-      "A pool day trip, lodging, restaurant and countryside events near Santa Marta, Colombia. Book on WhatsApp. Rated 4.4★ on Google.",
-    nav: {
-      about: "About",
-      services: "Services",
-      gallery: "Gallery",
-      reviews: "Reviews",
-      location: "Location",
-      book: "Book now",
-    },
-    hero: {
-      pill: "Santa Marta, Magdalena",
-      title: "Nature, a pool and good food, minutes from Santa Marta.",
-      subtitle:
-        "Day trips, lodging, restaurant and events surrounded by the green of the Sierra Nevada.",
-      ctaPrimary: "Book on WhatsApp",
-      ctaSecondary: "See the place",
-    },
-    stats: [
-      { value: "4.4★", label: "on Google", sub: `${RATING_COUNT} reviews` },
-      { value: "6.4K+", label: "on Instagram", sub: "community following us" },
-      {
-        value: "4",
-        label: "experiences",
-        sub: "day trips, lodging, dining and events",
-      },
-      { value: "100%", label: "outdoors", sub: "in the Sierra Nevada green" },
-    ],
-    about: {
-      kicker: "Who we are",
-      title: "A green space to truly switch off.",
-      body: "Sierra Campestre is a countryside estate minutes from Santa Marta, built to slow you down: a pool, shade from big trees, home-style cooking and the unhurried pace of the countryside. Whether it's a family day trip, a weekend stay, or a special event, the starting point here is always the same: real nature.", // DUMMY
-      cta: "Message us on WhatsApp",
-    },
-    services: {
-      kicker: "What you'll find here",
-      title: "Four ways to enjoy Sierra Campestre",
-      items: [
-        {
-          name: "Day pass",
-          desc: "Lunch included with a choice of 6 grilled proteins (beef, tenderloin, chicken breast, spider-cut chicken, thin-cut beef, or dried beef), plus access to the pool, zip line, green areas, soccer field and swings.",
-          note: "Adults $45,000 COP · Kids 4–10 $25,000 COP (kids' menu included)",
-          ctaLabel: "Book a day pass",
-        },
-        {
-          name: "Lodging",
-          desc: "Rooms for a night or a few, with breakfast included in the couple's room.",
-          note: "Check-in 8:00 a.m. · Check-out 1:00 p.m.",
-          ctaLabel: "Choose a room",
-        },
-        {
-          name: "Events",
-          desc: "Birthdays, countryside weddings and corporate events in a natural setting.",
-          note: "Quoted per event — booking required",
-          ctaLabel: "Get an event quote",
-        },
-      ],
-    },
-    gallery: {
-      kicker: "Gallery",
-      title: "This is Sierra Campestre",
-      items: [
-        "Main area",
-        "Green shaded areas",
-        "Cute animals",
-        "The grill",
-        "Zip line",
-        "Sunsets",
-        "Swimming pool",
-        "Relaxing area",
-      ], // DUMMY captions — adjust to match your real photos
-    },
-    reviews: {
-      kicker: "Real reviews",
-      title: "What past visitors say",
-      ratingLabel: `${RATING} out of 5 · ${RATING_COUNT} Google reviews`,
-      seeAll: "See all reviews on Google",
-      seeThis: "See this review on Google",
-    },
-    instagram: {
-      kicker: "Follow along",
-      title: "Live nature, relax and enjoy with us",
-      followers: "followers",
-      cta: "Follow on Instagram",
-    },
-    location: {
-      kicker: "Getting there",
-      title: "We'll be waiting in Santa Marta",
-      address: "Vereda El Campano, Santa Marta, Magdalena", // DUMMY
-      addressNote: "Exact address to be confirmed",
-      hours: "Every day, 9:00 a.m. – 6:00 p.m.", // DUMMY
-      hoursNote: "Placeholder hours — confirm",
-      phone: "Call",
-      whatsapp: "Message on WhatsApp",
-      mapsCta: "View on Google Maps",
-    },
-    ctaBand: {
-      title: "Ready for your next getaway?",
-      subtitle: "Tell us what you're planning and we'll help you set it up.",
-      cta: "Book on WhatsApp",
-    },
-    footer: {
-      tagline: "Day trips · Lodging · Restaurant · Events",
-      rights: "All rights reserved.",
-      madeNote:
-        "Site under construction — replace anything marked DUMMY before publishing.",
-    },
-    whatsapp: {
-      tooltip: "Chat with us",
-      message: "Hi, I'd like more information about Sierra Campestre.",
-    },
-    langSwitch: "Español",
-  },
-};
-
 // ---- Small building blocks --------------------------------------------------
-
-function ColombiaFlag({ className }) {
-  return (
-    <svg viewBox="0 0 30 20" className={className} aria-hidden="true">
-      <rect width="30" height="20" fill="#FCD116" />
-      <rect width="30" height="10" y="10" fill="#003893" />
-      <rect width="30" height="5" y="15" fill="#CE1126" />
-    </svg>
-  );
-}
-
-function USFlag({ className }) {
-  return (
-    <svg viewBox="0 0 30 20" className={className} aria-hidden="true">
-      <rect width="30" height="20" fill="#B22234" />
-      {[...Array(6)].map((_, i) => (
-        <rect
-          key={i}
-          width="30"
-          height="1.54"
-          y={1.54 * (i * 2 + 1)}
-          fill="#fff"
-        />
-      ))}
-      <rect width="12" height="10.77" fill="#3C3B6E" />
-    </svg>
-  );
-}
 
 function MacawMark({ className }) {
   // Minimalist geometric macaw silhouette — the "guacamaya azul" logomark.
@@ -437,20 +152,44 @@ function Reveal({ as: Tag = "div", delay, className = "", children }) {
 
 export default function App() {
   const [lang, setLang] = useState("es");
+  const [content] = useSiteContent();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const t = COPY[lang];
 
-  const [route, setRoute] = useState(window.location.hash);
-  const [content] = useSiteContent();
+  const statValues = [
+    `${content.googleRating}★`,
+    formatFollowers(content.instagramFollowers),
+    money(content.pasadia.adultPrice, lang),
+    "100%",
+  ];
+  const ratingLabel =
+    lang === "es"
+      ? `${content.googleRating} de 5 · ${content.googleReviewCount} reseñas en Google`
+      : `${content.googleRating} de 5 · ${content.googleReviewCount} Google reviews`;
+  const phoneDisplay = formatPhoneCO(content.whatsappNumber);
+  const heroSubtitle = t.hero.subtitleTemplate.replace(
+    "{price}",
+    money(content.pasadia.adultPrice, lang),
+  );
+
+  // state additions inside App()
+  const [activeModal, setActiveModal] = useState(null); // null | "room" | "event"
+
+  // build all WhatsApp links off content.whatsappNumber instead of a hardcoded constant
+  const waHref = `https://wa.me/${content.whatsappNumber}?text=${encodeURIComponent(t.whatsapp.message)}`;
+  const pasadiaWaHref = `https://wa.me/${content.whatsappNumber}?text="Hola, vengo de la página web. Me gustaría reservar una pasadía en Sierra Campestre`;
+  const telHref = `tel:+${content.whatsappNumber}`;
+
+  const [route, setRoute] = useState(window.location.pathname);
 
   useEffect(() => {
-    const onHash = () => setRoute(window.location.hash);
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const onPop = () => setRoute(window.location.pathname);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  if (route === "#/admin") return <Admin />;
+  if (route.replace(/\/$/, "") === "/admin") return <Admin />;
 
   useEffect(() => {
     document.documentElement.lang = t.htmlLang;
@@ -475,9 +214,6 @@ export default function App() {
     () => setLang((l) => (l === "es" ? "en" : "es")),
     [],
   );
-
-  const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.whatsapp.message)}`;
-  const telHref = `tel:+${WHATSAPP_NUMBER}`;
 
   const navItems = [
     { href: "#nosotros", label: t.nav.about },
@@ -515,6 +251,7 @@ export default function App() {
               Sierra Campestre
             </span>
           </a>
+          <LangSwitch lang={lang} setLang={setLang} />
 
           <nav className="hidden md:flex items-center gap-7 text-[0.94rem] text-ink-soft">
             {navItems.map((item) => (
@@ -529,18 +266,6 @@ export default function App() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={toggleLang}
-              className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm hover:border-ink/30 transition-colors"
-              aria-label={`Switch language — ${t.langSwitch}`}
-            >
-              {lang === "es" ? (
-                <USFlag className="w-5 h-3.5 rounded-[2px]" />
-              ) : (
-                <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />
-              )}
-              {t.langSwitch}
-            </button>
             <a
               href={waHref}
               target="_blank"
@@ -595,17 +320,6 @@ export default function App() {
               </a>
             ))}
             <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={toggleLang}
-                className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1.5 text-sm"
-              >
-                {lang === "es" ? (
-                  <USFlag className="w-5 h-3.5 rounded-[2px]" />
-                ) : (
-                  <ColombiaFlag className="w-5 h-3.5 rounded-[2px]" />
-                )}
-                {t.langSwitch}
-              </button>
               <a
                 href={waHref}
                 target="_blank"
@@ -630,7 +344,7 @@ export default function App() {
                 : "Sierra Campestre pool and green grounds in Santa Marta"
             }
             className="absolute inset-0 w-full h-full object-cover"
-            fetchpriority="high"
+            fetchPriority="high"
           />
           <div
             className="absolute inset-0"
@@ -661,7 +375,7 @@ export default function App() {
               {t.hero.title}
             </h1>
             <p className="mt-5 text-sand/90 text-lg sm:text-xl max-w-xl leading-relaxed">
-              {t.hero.subtitle}
+              {heroSubtitle}
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -703,7 +417,7 @@ export default function App() {
                 className={i > 0 ? "border-l border-sand/15 pl-6 sm:pl-8" : ""}
               >
                 <div className="font-display text-2xl sm:text-3xl text-mango">
-                  {s.value}
+                  {statValues[i]}
                 </div>
                 <div className="text-sm text-sand/90 mt-1">{s.label}</div>
                 <div className="text-xs text-sand/55 mt-0.5">{s.sub}</div>
@@ -728,7 +442,7 @@ export default function App() {
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-8 text-lagoon font-medium link-underline"
+              className="inline-flex items-center justify-center mt-8 rounded-full border-2 border-ink text-ink px-6 py-3 font-medium hover:bg-ink hover:text-sand transition-colors"
             >
               {t.about.cta}
               <svg
@@ -771,74 +485,106 @@ export default function App() {
           </Reveal>
 
           <div className="mt-12 grid sm:grid-cols-3 gap-px bg-ink/10 rounded-2xl overflow-hidden">
-            {t.services.items.map((item, i) => (
-              <Reveal
-                key={item.name}
-                delay={(i % 2) + 1}
-                className="bg-sand-deep overflow-hidden group"
-              >
-                <div className="aspect-[16/10] overflow-hidden">
-                  <img
-                    src={SERVICES_META[i].image}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-[var(--ease-out-strong)] group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-8 sm:p-10">
-                  <h3 className="font-display text-xl">{item.name}</h3>
-                  <p className="mt-2.5 text-ink-soft leading-relaxed">
-                    {item.desc}
-                  </p>
-                  <p className="mt-4 text-xs text-ink-soft/70 italic">
-                    {item.note}
-                  </p>
-                  <a
-                    href={SERVICES_META[i].ctaHref}
-                    className="inline-flex items-center gap-2 mt-6 text-lagoon font-medium link-underline"
-                  >
-                    {item.ctaLabel}
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </a>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+            {t.services.items.map((item, i) => {
+              const meta = SERVICES_META[i];
+              return (
+                <Reveal
+                  key={item.name}
+                  delay={(i % 3) + 1}
+                  className="bg-sand-deep overflow-hidden group flex flex-col"
+                >
+                  <div className="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={meta.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-[var(--ease-out-strong)] group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-8 sm:p-10 flex flex-col flex-1">
+                    <h3 className="font-display text-xl">{item.name}</h3>
+                    <p className="mt-2.5 text-ink-soft leading-relaxed">
+                      {item.desc}
+                    </p>
 
-      <section id="reserva" className="py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <Reveal className="max-w-lg">
-            <p className="text-sm font-medium text-leaf">
-              {lang === "es" ? "Reserva de una vez" : "Book right now"}
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3">
-              {lang === "es" ? "Dinos qué necesitas" : "Tell us what you need"}
-            </h2>
-          </Reveal>
-          <div className="mt-10 grid md:grid-cols-2 gap-6">
-            <Reveal delay={1} id="reserva-hospedaje">
-              <h3 className="font-display text-lg mb-3">
-                {lang === "es" ? "Hospedaje" : "Lodging"}
-              </h3>
-              <BookingWidget mode="room" rooms={content.rooms} lang={lang} />
-            </Reveal>
-            <Reveal delay={2} id="reserva-evento">
-              <h3 className="font-display text-lg mb-3">
-                {lang === "es" ? "Eventos" : "Events"}
-              </h3>
-              <BookingWidget mode="event" lang={lang} />
-            </Reveal>
+                    {item.priceLine && (
+                      <p className="mt-4 font-display text-2xl text-lagoon">
+                        {item.priceLine}
+                      </p>
+                    )}
+                    {item.note && (
+                      <p className="mt-1 text-xs text-ink-soft/70">
+                        {item.note}
+                      </p>
+                    )}
+
+                    <div className="mt-auto pt-6">
+                      {meta.ctaType === "whatsapp-pasadia" && (
+                        <>
+                          <p className="font-display text-2xl text-lagoon">
+                            {money(content.pasadia.adultPrice, lang)}{" "}
+                            {lang === "es" ? "adultos" : "adults"}
+                          </p>
+                          {item.note && (
+                            <p className="mt-1 text-xs text-ink-soft/70">
+                              {item.note}
+                            </p>
+                          )}
+                          <a
+                            href={pasadiaWaHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center w-full sm:w-auto mt-5 rounded-full bg-lagoon text-sand px-6 py-3 font-medium hover:bg-lagoon-deep transition-colors"
+                          >
+                            {item.ctaLabel}
+                          </a>
+                        </>
+                      )}
+
+                      {meta.ctaType === "modal-room" && (
+                        <>
+                          <p className="font-display text-2xl text-lagoon">
+                            {lang === "es" ? "Desde" : "From"}{" "}
+                            {money(
+                              Math.min(...content.rooms.map((r) => r.price)),
+                              lang,
+                            )}
+                            {lang === "es" ? "/noche" : "/night"}
+                          </p>
+                          {item.note && (
+                            <p className="mt-1 text-xs text-ink-soft/70">
+                              {item.note}
+                            </p>
+                          )}
+                          <button
+                            onClick={() => setActiveModal("room")}
+                            className="inline-flex items-center justify-center w-full sm:w-auto mt-5 rounded-full border-2 border-ink text-ink px-6 py-3 font-medium hover:bg-ink hover:text-sand transition-colors"
+                          >
+                            {item.ctaLabel}
+                          </button>
+                        </>
+                      )}
+
+                      {meta.ctaType === "modal-event" && (
+                        <>
+                          {item.note && (
+                            <p className="text-xs text-ink-soft/70">
+                              {item.note}
+                            </p>
+                          )}
+                          <button
+                            onClick={() => setActiveModal("event")}
+                            className="inline-flex items-center justify-center w-full sm:w-auto mt-5 rounded-full border-2 border-ink text-ink px-6 py-3 font-medium hover:bg-ink hover:text-sand transition-colors"
+                          >
+                            {item.ctaLabel}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -858,7 +604,7 @@ export default function App() {
               <div
                 key={i}
                 data-carousel-item
-                className="snap-start shrink-0 w-[78%] sm:w-[380px] relative overflow-hidden rounded-xl aspect-[4/3]"
+                className="snap-start shrink-0 w-[88%] sm:w-[380px] relative overflow-hidden rounded-xl aspect-[4/3]"
               >
                 <img
                   src={src}
@@ -888,7 +634,7 @@ export default function App() {
             </h2>
           </Reveal>
           <Reveal delay={1} className="mt-10">
-            <InstagramEmbed url={content.instagramReelUrl} />
+           <YouTubeEmbed videoId={parseYouTubeId(content.youtubeUrl)} title="Sierra Campestre" />
           </Reveal>
         </div>
       </section>
@@ -905,10 +651,8 @@ export default function App() {
               {t.reviews.title}
             </h2>
             <div className="flex items-center gap-2 mt-4">
-              <Stars count={4} />
-              <span className="text-sm text-sand/80">
-                {t.reviews.ratingLabel}
-              </span>
+              <Stars count={Math.round(content.googleRating)} />
+              <span className="text-sm text-sand/80">{ratingLabel}</span>
             </div>
           </Reveal>
 
@@ -917,7 +661,7 @@ export default function App() {
               <div
                 key={r.name}
                 data-carousel-item
-                className="snap-start shrink-0 w-[85%] sm:w-[400px] bg-sand/[0.06] border border-sand/15 rounded-2xl p-7"
+                className="snap-start shrink-0 w-[90%] sm:w-[400px] bg-sand/[0.06] border border-sand/15 rounded-2xl p-7"
               >
                 <Stars count={r.stars} />
                 <p className="mt-4 text-sand/95 leading-relaxed text-[0.97rem]">
@@ -948,16 +692,6 @@ export default function App() {
               className="inline-flex items-center gap-2 text-sand font-medium link-underline"
             >
               {t.reviews.seeAll}
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
             </a>
           </div>
         </div>
@@ -983,7 +717,9 @@ export default function App() {
               <p className="mt-3 text-ink-soft">
                 {INSTAGRAM_HANDLE} ·{" "}
                 <span className="font-medium text-ink">
-                  {INSTAGRAM_FOLLOWERS}
+                  {content.instagramFollowers.toLocaleString(
+                    lang === "es" ? "es-CO" : "en-US",
+                  )}
                 </span>{" "}
                 {t.instagram.followers}
               </p>
@@ -1029,19 +765,13 @@ export default function App() {
 
             <dl className="mt-8 space-y-6">
               <div>
-                <dt className="text-sm text-ink-soft">{t.location.address}</dt>
-                <dd className="text-xs text-mango-deep mt-1">
-                  {t.location.addressNote}
-                </dd>
+                <dt className="text-sm text-ink-soft">{content.address}</dt>
               </div>
               <div>
-                <dt className="text-sm text-ink-soft">{t.location.hours}</dt>
-                <dd className="text-xs text-mango-deep mt-1">
-                  {t.location.hoursNote}
-                </dd>
+                <dt className="text-sm text-ink-soft">{content.hours[lang]}</dt>
               </div>
               <div>
-                <dt className="text-sm text-ink-soft">{PHONE_DISPLAY}</dt>
+                <dt className="text-sm text-ink-soft">{phoneDisplay}</dt>
               </div>
             </dl>
 
@@ -1210,6 +940,33 @@ export default function App() {
           </span>
         </span>
       </a>
+
+      <Modal
+        open={activeModal === "room"}
+        onClose={() => setActiveModal(null)}
+        title={lang === "es" ? "Reservar habitación" : "Book a room"}
+      >
+        <BookingWidget
+          mode="room"
+          rooms={content.rooms}
+          lang={lang}
+          whatsappNumber={content.whatsappNumber}
+          onDone={() => setActiveModal(null)}
+        />
+      </Modal>
+
+      <Modal
+        open={activeModal === "event"}
+        onClose={() => setActiveModal(null)}
+        title={lang === "es" ? "Cotizar evento" : "Get an event quote"}
+      >
+        <BookingWidget
+          mode="event"
+          lang={lang}
+          whatsappNumber={content.whatsappNumber}
+          onDone={() => setActiveModal(null)}
+        />
+      </Modal>
     </div>
   );
 }

@@ -1,21 +1,29 @@
-import { useEffect } from "react";
+// src/components/InstagramEmbed.jsx — replace file
+import { useEffect, useRef } from "react";
 
 export default function InstagramEmbed({ url }) {
+  const containerRef = useRef(null);
+
   useEffect(() => {
-    const process = () => window.instgrm && window.instgrm.Embeds.process();
+    const process = () => window.instgrm?.Embeds?.process();
     if (window.instgrm) {
       process();
-    } else {
+    } else if (!document.getElementById("ig-embed-script")) {
       const script = document.createElement("script");
+      script.id = "ig-embed-script";
       script.src = "https://www.instagram.com/embed.js";
       script.async = true;
       script.onload = process;
       document.body.appendChild(script);
+    } else {
+      // script tag exists but might not have fired onload yet — retry shortly
+      const t = setTimeout(process, 600);
+      return () => clearTimeout(t);
     }
   }, [url]);
 
   return (
-    <div className="flex justify-center">
+    <div ref={containerRef} className="flex justify-center">
       <blockquote
         className="instagram-media"
         data-instgrm-captioned

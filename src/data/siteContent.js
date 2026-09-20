@@ -1,4 +1,9 @@
 export const DEFAULT_CONTENT = {
+  whatsappNumber: "573016081833",
+  instagramFollowers: 6424,
+  googleRating: 4.4,
+  googleReviewCount: 16,
+  youtubeUrl: "https://youtube.com/shorts/0L77iIWpnes?si=-QYyf4zOlmHqxfEE",
   hours: { es: "Todos los días, 8:00 a.m. – 6:00 p.m.", en: "Every day, 8:00 a.m. – 6:00 p.m." },
   hoursNote: { es: "La mayoría llega el fin de semana, ¡pero abrimos toda la semana!", en: "Most people come on weekends, but we're open all week." },
   address: "Vía Minca, frente a la cancha sintética de Tres Puentes, Santa Marta, Magdalena",

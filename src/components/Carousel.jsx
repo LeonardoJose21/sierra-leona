@@ -30,6 +30,9 @@ export default function Carousel({ children, autoPlayMs = 4200, className = "" }
     return () => clearInterval(timerRef.current);
   }, [autoPlayMs, scrollByCard]);
 
+  const arrowClass =
+  "flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-sand/95 backdrop-blur shadow-lg border border-ink/10 hover:border-ink/25 active:scale-95 transition-[transform,border-color] shrink-0 text-ink";
+
   return (
     <div className={`relative ${className}`}>
       <div
@@ -38,14 +41,16 @@ export default function Carousel({ children, autoPlayMs = 4200, className = "" }
       >
         {children}
       </div>
-      <button type="button" onClick={() => scrollByCard(-1)} aria-label="Anterior"
-        className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-sand shadow-lg items-center justify-center border border-ink/10 hover:border-ink/25 transition-colors">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 6l-6 6 6 6" /></svg>
-      </button>
-      <button type="button" onClick={() => scrollByCard(1)} aria-label="Siguiente"
-        className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-sand shadow-lg items-center justify-center border border-ink/10 hover:border-ink/25 transition-colors">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6l6 6-6 6" /></svg>
-      </button>
+
+      {/* Arrows: always visible (mobile included), same size/position on every use of this component */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1 sm:-mx-5">
+        <button type="button" onClick={() => scrollByCard(-1)} aria-label="Anterior" className={`${arrowClass} pointer-events-auto`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 6l-6 6 6 6" /></svg>
+        </button>
+        <button type="button" onClick={() => scrollByCard(1)} aria-label="Siguiente" className={`${arrowClass} pointer-events-auto`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M9 6l6 6-6 6" /></svg>
+        </button>
+      </div>
     </div>
   );
 }

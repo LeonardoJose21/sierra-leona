@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSiteContent } from "../hooks/useSiteContent";
 
-const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD;
+const ADMIN_PASSWORD = import.meta.env.VITE_PANEL_NUMBER;
 
 export default function Admin() {
   const [content, saveContent] = useSiteContent();

@@ -29,8 +29,7 @@ import BookingWidget from "./components/BookingWidget";
 import { COPY } from "./Copy";
 
 // ---- Business constants ----------------------------------------------------
-const PHONE_DISPLAY = "+57 301 608 1833";
-const SECONDARY_WHATSAPP = "573006546347"; // shown in footer only — not admin-editable, not used in any CTA
+const PHONE_DISPLAY = "+57 301 608 1833"; // shown in footer only — not admin-editable, not used in any CTA
 const GOOGLE_PROFILE_URL = "https://share.google/ACfExejzW4hhLi1cB";
 const INSTAGRAM_URL = "https://www.instagram.com/sierra.campestre/";
 const INSTAGRAM_HANDLE = "@sierra.campestre";
@@ -401,17 +400,17 @@ export default function App() {
 
         {/* ---- Trust bar ---- */}
         <div className="bg-lagoon-deep text-sand">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8 py-7 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8 py-7 grid grid-cols-3 gap-4 sm:gap-10">
             {t.stats.map((s, i) => (
               <div
                 key={i}
-                className={i > 0 ? "border-l border-sand/15 pl-6 sm:pl-8" : ""}
+                className={`text-center sm:text-left ${i > 0 ? "border-l border-sand/15 pl-3 sm:pl-8" : ""}`}
               >
-                <div className="font-display text-2xl sm:text-3xl text-mango">
+                <div className="font-display text-xl sm:text-3xl text-mango">
                   {statValues[i]}
                 </div>
                 <div className="text-sm text-sand/90 mt-1">{s.label}</div>
-                <div className="text-xs text-sand/55 mt-0.5">{s.sub}</div>
+                <div className="text-xs text-sand/75 mt-0.5">{s.sub}</div>
               </div>
             ))}
           </div>
@@ -505,28 +504,25 @@ export default function App() {
                     )}
 
                     <div className="mt-auto pt-6">
-                      {meta.ctaType === "whatsapp-pasadia" && (
+                      {meta.ctaType === "modal-pasadia" && (
                         <>
                           <p className="font-display text-2xl text-lagoon">
                             {money(content.pasadia.adultPrice, lang)}{" "}
                             {lang === "es" ? "adultos" : "adults"}
                           </p>
                           {item.note && (
-                            <p className="mt-2 inline-block rounded-full bg-mango/20 text-mango-deep text-base font-semibold px-3 py-2">
+                            <p className="mt-2 inline-block rounded-full bg-mango/20 text-mango-deep text-sm font-semibold px-3 py-1.5">
                               {item.note}
                             </p>
                           )}
-                          <a
-                            href={pasadiaWaHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() => setActiveModal("pasadia")}
                             className="inline-flex items-center justify-center w-full sm:w-auto mt-5 rounded-full bg-lagoon text-sand px-6 py-3 font-medium hover:bg-lagoon-deep transition-colors"
                           >
                             {item.ctaLabel}
-                          </a>
+                          </button>
                         </>
                       )}
-
                       {meta.ctaType === "modal-room" && (
                         <>
                           <p className="font-display text-2xl text-lagoon">
@@ -590,7 +586,7 @@ export default function App() {
               <div
                 key={i}
                 data-carousel-item
-                className="snap-start shrink-0 w-[88%] sm:w-[380px] relative overflow-hidden rounded-xl aspect-[4/3]"
+                className="snap-start shrink-0 w-[88%] sm:w-[340px] relative overflow-hidden rounded-xl aspect-[4/5]"
               >
                 <img
                   src={src}
@@ -760,7 +756,9 @@ export default function App() {
                 <dt className="text-sm text-ink-soft">{content.hours[lang]}</dt>
               </div>
               <div>
-                <dt className="text-sm text-ink-soft">{phoneDisplay} --- +57 300 654 6347</dt>
+                <dt className="text-sm text-ink-soft">
+                  {phoneDisplay} --- +57 300 654 6347
+                </dt>
               </div>
             </dl>
 
@@ -953,6 +951,21 @@ export default function App() {
           mode="event"
           lang={lang}
           whatsappNumber={content.whatsappNumber}
+          onDone={() => setActiveModal(null)}
+        />
+      </Modal>
+
+      <Modal
+        open={activeModal === "pasadia"}
+        onClose={() => setActiveModal(null)}
+        title={lang === "es" ? "Reservar pasadía" : "Book a day pass"}
+      >
+        <BookingWidget
+          mode="pasadia"
+          lang={lang}
+          whatsappNumber={content.whatsappNumber}
+          adultPrice={content.pasadia.adultPrice}
+          childPrice={content.pasadia.childPrice}
           onDone={() => setActiveModal(null)}
         />
       </Modal>

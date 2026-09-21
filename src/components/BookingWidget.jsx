@@ -1,13 +1,19 @@
 import { useState } from "react";
+import { money } from "../utils/format";
 
 export default function BookingWidget({
   mode,
   rooms = [],
   lang = "es",
   whatsappNumber,
+  adultPrice,
+  childPrice,
   onDone,
 }) {
   const isEvent = mode === "event";
+  const isPasadia = mode === "pasadia";
+  const [adults, setAdults] = useState(2);
+  const [kids, setKids] = useState(0);
   const [roomId, setRoomId] = useState(rooms[0]?.id ?? "");
   const [eventType, setEventType] = useState("cumpleaños");
   const [date, setDate] = useState("");
@@ -15,6 +21,13 @@ export default function BookingWidget({
   const [error, setError] = useState("");
 
   const buildMessage = () => {
+    if (isPasadia) {
+      const total = adults * adultPrice + kids * childPrice;
+      return lang === "es"
+        ? `Hola, vengo del sitio web. Quiero reservar pasadía para el ${date}: ${adults} adultos y ${kids} niños. Total aprox: ${money(total, lang)}.`
+        : `Hi, I come from your website. I'd like to book a day pass for ${date}: ${adults} adults and ${kids} kids. Approx total: ${money(total, lang)}.`;
+    }
+
     if (isEvent) {
       return lang === "es"
         ? `Hola, vengo de su página web. Quiero cotizar un evento (${eventType}) para el ${date}.`
@@ -44,7 +57,7 @@ export default function BookingWidget({
 
   return (
     <form onSubmit={handleSubmit}>
-      {!isEvent && (
+      {!isEvent && !isPasadia &&(
         <div>
           <label className="text-sm text-ink-soft">
             {lang === "es" ? "Habitación" : "Room"}
@@ -83,13 +96,24 @@ export default function BookingWidget({
             <option value="empresarial">
               {lang === "es" ? "Empresarial" : "Corporate"}
             </option>
+            <option value="Graduacion">
+              {lang === "es" ? "Graduación" : "Graduation"}
+            </option>
             <option value="otro">{lang === "es" ? "Otro" : "Other"}</option>
           </select>
         </div>
       )}
 
-      <div className={isEvent ? "mt-4" : "grid grid-cols-2 gap-4 mt-4"}>
-        <div>
+      <div
+        className={
+          isEvent
+            ? "mt-4"
+            : isPasadia
+              ? "grid grid-cols-3 gap-3 mt-4"
+              : "grid grid-cols-2 gap-4 mt-4"
+        }
+      >
+        <div className={isPasadia ? "col-span-3" : ""}>
           <label className="text-sm text-ink-soft">
             {lang === "es" ? "Fecha" : "Date"}{" "}
             <span className="text-mango-deep">*</span>
@@ -106,7 +130,8 @@ export default function BookingWidget({
             className={`mt-1 w-full rounded-lg border px-3 py-2.5 ${error ? "border-red-400" : "border-ink/15"}`}
           />
         </div>
-        {!isEvent && (
+
+        {!isEvent && !isPasadia && (
           <div>
             <label className="text-sm text-ink-soft">
               {lang === "es" ? "Personas" : "Guests"}
@@ -120,7 +145,45 @@ export default function BookingWidget({
             />
           </div>
         )}
+
+        {isPasadia && (
+          <>
+            <div>
+              <label className="text-sm text-ink-soft">
+                {lang === "es" ? "Adultos" : "Adults"}
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={adults}
+                onChange={(e) => setAdults(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-ink-soft">
+                {lang === "es" ? "Niños" : "Kids"}
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={kids}
+                onChange={(e) => setKids(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5"
+              />
+            </div>
+          </>
+        )}
       </div>
+
+      {isPasadia && adults + kids > 0 && (
+        <p className="mt-3 text-sm text-ink-soft">
+          {lang === "es" ? "Total aprox." : "Approx. total"}:{" "}
+          <span className="font-semibold text-ink">
+            {money(adults * adultPrice + kids * childPrice, lang)}
+          </span>
+        </p>
+      )}
 
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 

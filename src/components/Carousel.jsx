@@ -30,9 +30,8 @@ export default function Carousel({ children, autoPlayMs = 4200, className = "" }
     return () => clearInterval(timerRef.current);
   }, [autoPlayMs, scrollByCard]);
 
-  const arrowClass =
-  "flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-sand/95 backdrop-blur shadow-lg border border-ink/10 hover:border-ink/25 active:scale-95 transition-[transform,border-color] shrink-0 text-ink";
-
+const arrowClass =
+  "flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-sand/85 backdrop-blur shadow-sm border border-ink/10 hover:border-ink/25 hover:bg-sand active:scale-95 transition-[transform,border-color,background-color] shrink-0 text-ink";
   return (
     <div className={`relative ${className}`}>
       <div

@@ -4,28 +4,33 @@ import Admin from "./pages/Admin";
 import { useSiteContent } from "./hooks/useSiteContent";
 import Modal from "./components/Modal";
 import { money, formatPhoneCO, formatFollowers } from "./utils/format";
-import LangSwitch from "./components/LangSwitch"
+import LangSwitch from "./components/LangSwitch";
 import YouTubeEmbed from "./components/YouTubeEmbed";
 import { parseYouTubeId } from "./utils/youtube";
 
 // ---- Replace these with your own images from src/assets -------------------
 // Drop files with these exact names in src/assets, or edit the paths below.
 import heroImg from "./assets/hero.jpg";
-import aboutImg from "./assets/about.png";
+import aboutImg from "./assets/about.jpg";
 import gallery1 from "./assets/gallery-1.png";
 import gallery2 from "./assets/gallery-2.png";
-import gallery3 from "./assets/gallery-3.png";
-import gallery4 from "./assets/gallery-4.png";
+import gallery3 from "./assets/gallery-3.jpg";
 import gallery5 from "./assets/gallery-5.png";
-import gallery6 from "./assets/gallery-6.png";
-import gallery7 from "./assets/gallery-7.png";
+import gallery6 from "./assets/gallery-6.jpg";
+import gallery7 from "./assets/gallery-7.jpg";
 import gallery8 from "./assets/gallery-8.png";
+import gallery9 from "./assets/gallery-9.jpg";
+import gallery10 from "./assets/gallery-10.jpg";
+import gallery11 from "./assets/gallery-11.jpg";
+import gallery12 from "./assets/gallery-12.jpg";
+
 import Carousel from "./components/Carousel";
 import BookingWidget from "./components/BookingWidget";
 import { COPY } from "./Copy";
 
 // ---- Business constants ----------------------------------------------------
 const PHONE_DISPLAY = "+57 301 608 1833";
+const SECONDARY_WHATSAPP = "573006546347"; // shown in footer only — not admin-editable, not used in any CTA
 const GOOGLE_PROFILE_URL = "https://share.google/ACfExejzW4hhLi1cB";
 const INSTAGRAM_URL = "https://www.instagram.com/sierra.campestre/";
 const INSTAGRAM_HANDLE = "@sierra.campestre";
@@ -64,24 +69,7 @@ const REVIEWS = [
 // ---- Small building blocks --------------------------------------------------
 
 function MacawMark({ className }) {
-  // Minimalist geometric macaw silhouette — the "guacamaya azul" logomark.
-  return (
-    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
-      <path
-        d="M20 10C28 6 40 8 46 18C50 24 50 30 46 36L52 38C54 39 54 41 52 42L44 44C42 50 36 54 29 54C20 54 12 47 12 37C12 30 15 25 15 25C11 24 8 20 8 16C8 16 14 17 17 20C17 14 18 12 20 10Z"
-        fill="var(--color-lagoon)"
-      />
-      <path
-        d="M29 54C24 54 19 51 16 47C19 49 24 50 28 49C33 48 36 44 37 40C39 44 39 49 35 52C33 53.5 31 54 29 54Z"
-        fill="var(--color-mango)"
-      />
-      <circle cx="24" cy="20" r="2.4" fill="var(--color-sand)" />
-      <path
-        d="M46 18C48 19 49 21 48 23C46 22 44 20 44 18C44.7 17.6 45.4 17.7 46 18Z"
-        fill="var(--color-mango)"
-      />
-    </svg>
-  );
+  return <img src="logo.png" alt="Sierra Campestre" className={className} />;
 }
 
 function Stars({ count, className = "" }) {
@@ -160,7 +148,7 @@ export default function App() {
   const statValues = [
     `${content.googleRating}★`,
     formatFollowers(content.instagramFollowers),
-    money(content.pasadia.adultPrice, lang),
+    // money(content.pasadia.adultPrice, lang),
     "100%",
   ];
   const ratingLabel =
@@ -227,11 +215,14 @@ export default function App() {
     gallery1,
     gallery2,
     gallery3,
-    gallery4,
     gallery5,
     gallery6,
     gallery7,
     gallery8,
+    gallery9,
+    gallery10,
+    gallery11,
+    gallery12,
   ];
 
   return (
@@ -246,7 +237,7 @@ export default function App() {
       >
         <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#inicio" className="flex items-center gap-2 shrink-0">
-            <MacawMark className="w-8 h-8" />
+            <MacawMark className="w-12 h-12" />
             <span className="font-display text-lg text-ink">
               Sierra Campestre
             </span>
@@ -512,11 +503,6 @@ export default function App() {
                         {item.priceLine}
                       </p>
                     )}
-                    {item.note && (
-                      <p className="mt-1 text-xs text-ink-soft/70">
-                        {item.note}
-                      </p>
-                    )}
 
                     <div className="mt-auto pt-6">
                       {meta.ctaType === "whatsapp-pasadia" && (
@@ -526,7 +512,7 @@ export default function App() {
                             {lang === "es" ? "adultos" : "adults"}
                           </p>
                           {item.note && (
-                            <p className="mt-1 text-xs text-ink-soft/70">
+                            <p className="mt-2 inline-block rounded-full bg-mango/20 text-mango-deep text-base font-semibold px-3 py-2">
                               {item.note}
                             </p>
                           )}
@@ -552,7 +538,7 @@ export default function App() {
                             {lang === "es" ? "/noche" : "/night"}
                           </p>
                           {item.note && (
-                            <p className="mt-1 text-xs text-ink-soft/70">
+                            <p className="mt-2 text-base text-ink-soft">
                               {item.note}
                             </p>
                           )}
@@ -568,7 +554,7 @@ export default function App() {
                       {meta.ctaType === "modal-event" && (
                         <>
                           {item.note && (
-                            <p className="text-xs text-ink-soft/70">
+                            <p className="text-base text-ink-soft">
                               {item.note}
                             </p>
                           )}
@@ -634,7 +620,10 @@ export default function App() {
             </h2>
           </Reveal>
           <Reveal delay={1} className="mt-10">
-           <YouTubeEmbed videoId={parseYouTubeId(content.youtubeUrl)} title="Sierra Campestre" />
+            <YouTubeEmbed
+              videoId={parseYouTubeId(content.youtubeUrl)}
+              title="Sierra Campestre"
+            />
           </Reveal>
         </div>
       </section>
@@ -771,7 +760,7 @@ export default function App() {
                 <dt className="text-sm text-ink-soft">{content.hours[lang]}</dt>
               </div>
               <div>
-                <dt className="text-sm text-ink-soft">{phoneDisplay}</dt>
+                <dt className="text-sm text-ink-soft">{phoneDisplay} --- +57 300 654 6347</dt>
               </div>
             </dl>
 
@@ -844,7 +833,7 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 grid sm:grid-cols-[1fr_auto] gap-8 items-start">
           <div>
             <div className="flex items-center gap-2">
-              <MacawMark className="w-7 h-7" />
+              <MacawMark className="w-10 h-10" />
               <span className="font-display text-lg text-sand">
                 Sierra Campestre
               </span>
@@ -914,7 +903,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 mt-10 pt-6 border-t border-sand/10 text-xs text-sand/45 flex flex-col sm:flex-row gap-2 justify-between">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 mt-10 pt-6 border-t border-sand/10 text-xs text-sand/65 flex flex-col sm:flex-row gap-2 justify-between">
           <span>
             © {new Date().getFullYear()} Sierra Campestre. {t.footer.rights}
           </span>

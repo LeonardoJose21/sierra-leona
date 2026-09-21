@@ -23,10 +23,10 @@ export const COPY = {
     stats: [
       { label: "de calificación en Google", sub: `` },
       { label: "seguidores en Instagram", sub: "" },
-      {
-        label: "para la pasadía",
-        sub: "",
-      }, // real count, not dummy
+      // {
+      //   label: "para la pasadía",
+      //   sub: "",
+      // }, // real count, not dummy
       {
         value: "100%",
         label: "al aire libre",
@@ -41,7 +41,7 @@ export const COPY = {
     },
     services: {
       kicker: "Qué encuentras aquí",
-      title: "Cuatro formas de disfrutar Sierra Campestre",
+      title: "Tres formas de disfrutar Sierra Campestre",
       items: [
         // es
         {
@@ -72,11 +72,14 @@ export const COPY = {
         "Zona central",
         "Zonas verdes y sombra",
         "Animalitos",
-        "La parrilla",
         "Tirolesa",
-        "Atardecer",
+        "Columpios",
         "Piscina",
-        "Área de relajación",
+        "Relajación",
+        "Refrescos",
+        "Cancha de Fútbol",
+        "Celebración de eventos",
+        "Pasillo decorado"
       ],
     },
     reviews: {
@@ -143,10 +146,10 @@ export const COPY = {
     stats: [
       { label: "rating on Google", sub: `` },
       {label: "followers on Instagram", sub: "" },
-      {
-        label: "to get a pass day",
-        sub: "",
-      },
+      // {
+      //   label: "to get a pass day",
+      //   sub: "",
+      // },
       { value: "100%", label: "outdoors", sub: "" },
     ],
     about: {
@@ -157,7 +160,7 @@ export const COPY = {
     },
     services: {
       kicker: "What you'll find here",
-      title: "Four ways to enjoy Sierra Campestre",
+      title: "Three ways to enjoy Sierra Campestre",
       items: [
         // en
         {
@@ -187,11 +190,14 @@ export const COPY = {
         "Main area",
         "Green shaded areas",
         "Cute animals",
-        "The grill",
         "Zip line",
-        "Sunsets",
+        "Swing",
         "Swimming pool",
-        "Relaxing area",
+        "Relaxing",
+        "Fresh drinks",
+        "Soccer field",
+        "Event celebrations",
+        "Decorated hallway"
       ], // DUMMY captions — adjust to match your real photos
     },
     reviews: {

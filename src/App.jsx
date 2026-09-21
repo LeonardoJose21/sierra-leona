@@ -176,7 +176,7 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  if (route.replace(/\/$/, "") === "/admin") return <Admin />;
+  if (route.replace(/\/$/, "") === "/editar") return <Admin />;
 
   useEffect(() => {
     document.documentElement.lang = t.htmlLang;

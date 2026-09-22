@@ -114,7 +114,7 @@ export const COPY = {
       tagline: "Pasadía · Hospedaje · Restaurante · Eventos",
       rights: "Todos los derechos reservados.", // DUMMY year/legal name if different
       madeNote:
-        "Sitio en construcción — reemplaza los datos marcados como DUMMY antes de publicar.",
+        "",
     },
     whatsapp: {
       tooltip: "Escríbenos",
@@ -232,7 +232,7 @@ export const COPY = {
       tagline: "Day trips · Lodging · Restaurant · Events",
       rights: "All rights reserved.",
       madeNote:
-        "Site under construction — replace anything marked DUMMY before publishing.",
+        "",
     },
     whatsapp: {
       tooltip: "Chat with us",

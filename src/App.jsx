@@ -27,6 +27,7 @@ import gallery12 from "./assets/gallery-12.jpg";
 import Carousel from "./components/Carousel";
 import BookingWidget from "./components/BookingWidget";
 import { COPY } from "./Copy";
+import LazyVideo from "./components/LazyVideo";
 
 // ---- Business constants ----------------------------------------------------
 const PHONE_DISPLAY = "+57 301 608 1833"; // shown in footer only — not admin-editable, not used in any CTA
@@ -616,10 +617,11 @@ export default function App() {
             </h2>
           </Reveal>
           <Reveal delay={1} className="mt-10">
-            <YouTubeEmbed
+            {/* <YouTubeEmbed
               videoId={parseYouTubeId(content.youtubeUrl)}
               title="Sierra Campestre"
-            />
+            /> */}
+            <LazyVideo src="/video/sierra-reel.mp4" poster="/video/sierra-reel-poster.jpg" title="Sierra Campestre" duration={"01:21 min"}/>
           </Reveal>
         </div>
       </section>

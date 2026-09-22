@@ -211,7 +211,7 @@ export default function Admin() {
           </div>
         </section>
 
-        <label className="text-sm text-ink-soft block mt-2">
+        {/* <label className="text-sm text-ink-soft block mt-2">
           Link del video (YouTube)
         </label>
         <input
@@ -220,7 +220,7 @@ export default function Admin() {
           onChange={(e) => update(["youtubeUrl"], e.target.value)}
           className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2"
           placeholder="https://youtube.com/shorts/..."
-        />
+        /> */}
 
         <button
           onClick={handleSave}

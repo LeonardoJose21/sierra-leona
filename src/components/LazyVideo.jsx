@@ -54,11 +54,11 @@ export default function LazyVideo({ src, poster, title, duration }) {
 
             {/* Persistent bottom-left badge — reads as "video" even before hover/interaction */}
             <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-ink/70 backdrop-blur px-2.5 py-1.5">
-              <svg width="12" height="12" viewBox="0 0 32 32">
+              <svg width="14" height="14" viewBox="0 0 32 32">
                 <polygon points="10,6 26,16 10,26" fill="white" />
               </svg>
               {duration && (
-                <span className="text-white text-xs font-medium">
+                <span className="text-white text-sm font-medium">
                   {duration}
                 </span>
               )}

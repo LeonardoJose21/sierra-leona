@@ -46,7 +46,7 @@ export const COPY = {
         // es
         {
           name: "Pasadía",
-          desc: "Almuerzo incluido con 6 opciones de asado (carne, lomo, pechuga, pollo araña, loncha o carne oreada), más acceso a piscina, tirolesa, zonas verdes, cancha y columpios.",
+          desc: "Almuerzo incluido con 6 opciones de asado (carne, lomo, pechuga, pollo arana, loncha o carne oreada), más acceso a piscina, tirolesa, zonas verdes, cancha y columpios.",
           note: "Niños de 4 a 10 años: $25.000 (menú infantil incluido)",
           ctaLabel: "Reservar por WhatsApp",
         },
@@ -97,7 +97,7 @@ export const COPY = {
     location: {
       kicker: "Cómo llegar",
       title: "Te esperamos en Santa Marta",
-      address: "Vereda El Campano, Santa Marta, Magdalena", // DUMMY: replace with exact address
+      address: "Vía Minca, frente a la cancha sintética de Tres Puentes, Santa Marta, Magdalena", // DUMMY: replace with exact address
       addressNote: "Dirección exacta pendiente de confirmar",
       hours: "Todos los días, 9:00 a.m. – 6:00 p.m.", // DUMMY
       hoursNote: "Horario de referencia — confirmar",
@@ -165,7 +165,7 @@ export const COPY = {
         // en
         {
           name: "Day pass",
-          desc: "Lunch included with a choice of 6 grilled proteins (beef, tenderloin, chicken breast, spider-cut chicken, thin-cut beef, or dried beef), plus access to the pool, zip line, green areas, soccer field and swings.",
+          desc: "Lunch included with a choice of 6 grilled proteins (beef, tenderloin, chicken breast, frog cut chicken, thin-cut beef, or dried beef), plus access to the pool, zip line, green areas, soccer field and swings.",
           note: "Kids 4–10: $25,000 COP (kids' menu included)",
           ctaLabel: "Book on WhatsApp",
         },
@@ -215,7 +215,7 @@ export const COPY = {
     location: {
       kicker: "Getting there",
       title: "We'll be waiting in Santa Marta",
-      address: "Vereda El Campano, Santa Marta, Magdalena", // DUMMY
+      address: "Vía Minca, frente a la cancha sintética de Tres Puentes, Santa Marta, Magdalena", // DUMMY
       addressNote: "Exact address to be confirmed",
       hours: "Every day, 9:00 a.m. – 6:00 p.m.", // DUMMY
       hoursNote: "Placeholder hours — confirm",

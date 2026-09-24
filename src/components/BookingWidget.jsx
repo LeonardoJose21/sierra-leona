@@ -154,9 +154,12 @@ export default function BookingWidget({
               </label>
               <input
                 type="number"
-                // min={0}
+                min={0}
                 value={adults}
-                onChange={(e) => setAdults(Number(e.target.value))}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setAdults(next === "" ? "" : Number(next));
+                }}
                 className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5"
               />
             </div>
@@ -166,9 +169,12 @@ export default function BookingWidget({
               </label>
               <input
                 type="number"
-                // min={0}
+                min={0}
                 value={kids}
-                onChange={(e) => setKids(Number(e.target.value))}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setKids(next === "" ? "" : Number(next));
+                }}
                 className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5"
               />
             </div>

@@ -345,7 +345,7 @@ export default function App() {
             }}
           />
 
-          <div className="relative h-full mx-auto max-w-6xl px-5 sm:px-8 flex flex-col justify-end pb-14 sm:pb-20">
+          <div className="relative h-full mx-auto max-w-6xl px-5 sm:px-8 flex flex-col justify-end pb-14 sm:pb-10">
             <div className="inline-flex items-center gap-2 self-start rounded-full bg-sand/90 backdrop-blur px-3.5 py-1.5 mb-6 text-sm text-ink-soft">
               <svg
                 width="14"

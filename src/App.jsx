@@ -237,88 +237,88 @@ export default function App() {
       >
         <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#inicio" className="flex items-center gap-2 shrink-0">
-            <MacawMark className="w-12 h-12" />
-            <span className="font-display text-lg text-ink">
-              Sierra Campestre
-            </span>
+            <MacawMark className="w-auto h-12" />
           </a>
-          <LangSwitch lang={lang} setLang={setLang} />
 
-          <nav className="hidden md:flex items-center gap-7 text-[0.94rem] text-ink-soft">
-            {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="link-underline hover:text-ink transition-colors"
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
+          <div className="flex items-center gap-6 ml-auto">
+            <LangSwitch lang={lang} setLang={setLang} />
 
-          <div className="hidden md:flex items-center gap-3">
-            <a
-              href={waHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium hover:bg-lagoon-deep transition-colors"
-            >
-              {t.nav.book}
-            </a>
-          </div>
+            <nav className="hidden md:flex items-center gap-7 text-[0.94rem] text-ink-soft">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="link-underline hover:text-ink transition-colors"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
 
-          <button
-            className="md:hidden p-2 -mr-2 text-ink"
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-label="Menu"
-            aria-expanded={menuOpen}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              {menuOpen ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {/* Mobile menu */}
-        <div
-          className={`mobile-menu md:hidden overflow-hidden ${
-            menuOpen
-              ? "max-h-96 opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none"
-          }`}
-          style={{ transitionProperty: "max-height, opacity" }}
-        >
-          <div className="px-5 pb-6 pt-2 flex flex-col gap-4 bg-sand border-b border-ink/10">
-            {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="text-ink-soft text-base"
-              >
-                {item.label}
-              </a>
-            ))}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="hidden md:flex items-center gap-3">
               <a
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium"
+                className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium hover:bg-lagoon-deep transition-colors"
               >
                 {t.nav.book}
               </a>
+            </div>
+
+            <button
+              className="md:hidden p-2 -mr-2 text-ink"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label="Menu"
+              aria-expanded={menuOpen}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                {menuOpen ? (
+                  <path d="M6 6l12 12M18 6L6 18" />
+                ) : (
+                  <path d="M4 7h16M4 12h16M4 17h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile menu */}
+          <div
+            className={`mobile-menu md:hidden absolute top-full left-0 right-0 overflow-hidden ${
+              menuOpen
+                ? "max-h-96 opacity-100"
+                : "max-h-0 opacity-0 pointer-events-none"
+            }`}
+            style={{ transitionProperty: "max-height, opacity" }}
+          >
+            <div className="px-5 pb-6 pt-2 flex flex-col gap-4 bg-sand border-b border-ink/10">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-ink-soft text-base"
+                >
+                  {item.label}
+                </a>
+              ))}
+              <div className="flex items-center gap-3 pt-2">
+                <a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium"
+                >
+                  {t.nav.book}
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -621,7 +621,12 @@ export default function App() {
               videoId={parseYouTubeId(content.youtubeUrl)}
               title="Sierra Campestre"
             /> */}
-            <LazyVideo src="/video/sierra-reel.mp4" poster="/video/sierra-reel-poster.jpg" title="Sierra Campestre" duration={"01:21 min"}/>
+            <LazyVideo
+              src="/video/sierra-reel.mp4"
+              poster="/video/sierra-reel-poster.jpg"
+              title="Sierra Campestre"
+              duration={"01:21 min"}
+            />
           </Reveal>
         </div>
       </section>
@@ -833,10 +838,7 @@ export default function App() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 grid sm:grid-cols-[1fr_auto] gap-8 items-start">
           <div>
             <div className="flex items-center gap-2">
-              <MacawMark className="w-10 h-10" />
-              <span className="font-display text-lg text-sand">
-                Sierra Campestre
-              </span>
+              <MacawMark className="w-auto h-10" />
             </div>
             <p className="text-sm mt-3 max-w-xs">{t.footer.tagline}</p>
             <div className="flex items-center gap-4 mt-5">

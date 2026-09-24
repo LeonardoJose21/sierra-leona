@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-src/data/siteContent.js
+# src/data/siteContent.js
 
 node_modules
 .env

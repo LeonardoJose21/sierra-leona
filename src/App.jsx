@@ -625,7 +625,7 @@ export default function App() {
               src="/video/sierra-reel.mp4"
               poster="/video/sierra-reel-poster.jpg"
               title="Sierra Campestre"
-              duration={"01:21 min"}
+              duration={"01:00 min"}
             />
           </Reveal>
         </div>

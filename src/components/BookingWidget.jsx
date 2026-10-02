@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { money } from "../utils/format";
+import Clarity from "@microsoft/clarity";
 
 export default function BookingWidget({
   mode,
@@ -40,6 +41,11 @@ export default function BookingWidget({
       : `Hi, I'd like to book the ${roomName} for ${date}, ${guests} people.`;
   };
 
+  const trackClick = (location) => {
+    Clarity.event('whatsapp_click');
+    window.gtag?.('event', 'whatsapp_click', { button_location: location });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!date) {
@@ -51,6 +57,7 @@ export default function BookingWidget({
       return;
     }
     const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildMessage())}`;
+    trackClick(`booking-${mode}`);
     window.open(href, "_blank", "noopener,noreferrer");
     onDone?.();
   };

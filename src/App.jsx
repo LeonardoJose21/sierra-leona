@@ -5,8 +5,6 @@ import { useSiteContent } from "./hooks/useSiteContent";
 import Modal from "./components/Modal";
 import { money, formatPhoneCO, formatFollowers } from "./utils/format";
 import LangSwitch from "./components/LangSwitch";
-import YouTubeEmbed from "./components/YouTubeEmbed";
-import { parseYouTubeId } from "./utils/youtube";
 
 // ---- Replace these with your own images from src/assets -------------------
 // Drop files with these exact names in src/assets, or edit the paths below.
@@ -28,12 +26,18 @@ import Carousel from "./components/Carousel";
 import BookingWidget from "./components/BookingWidget";
 import { COPY } from "./Copy";
 import LazyVideo from "./components/LazyVideo";
+import Clarity from '@microsoft/clarity';
 
 // ---- Business constants ----------------------------------------------------
 const PHONE_DISPLAY = "+57 301 608 1833"; // shown in footer only — not admin-editable, not used in any CTA
 const GOOGLE_PROFILE_URL = "https://share.google/ACfExejzW4hhLi1cB";
 const INSTAGRAM_URL = "https://www.instagram.com/sierra.campestre/";
 const INSTAGRAM_HANDLE = "@sierra.campestre";
+
+const trackClick = (location) => {
+  Clarity.event('whatsapp_click');
+  window.gtag?.('event', 'whatsapp_click', { button_location: location });
+};
 
 const REVIEWS = [
   {
@@ -166,7 +170,6 @@ export default function App() {
 
   // build all WhatsApp links off content.whatsappNumber instead of a hardcoded constant
   const waHref = `https://wa.me/${content.whatsappNumber}?text=${encodeURIComponent(t.whatsapp.message)}`;
-  const pasadiaWaHref = `https://wa.me/${content.whatsappNumber}?text="Hola, vengo de la página web. Me gustaría reservar una pasadía en Sierra Campestre`;
   const telHref = `tel:+${content.whatsappNumber}`;
 
   const [route, setRoute] = useState(window.location.pathname);
@@ -258,6 +261,7 @@ export default function App() {
             <div className="hidden md:flex items-center gap-3">
               <a
                 href={waHref}
+                onClick={() => trackClick('header')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium hover:bg-lagoon-deep transition-colors"
@@ -312,6 +316,7 @@ export default function App() {
               <div className="flex items-center gap-3 pt-2">
                 <a
                   href={waHref}
+                  onClick={() => trackClick('mobile-menu')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full bg-lagoon text-sand px-4 py-2 text-sm font-medium"
@@ -374,6 +379,7 @@ export default function App() {
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackClick('hero')}
                 className="inline-flex items-center gap-2 rounded-full bg-mango text-ink px-6 py-3.5 font-medium hover:bg-mango-deep transition-colors"
               >
                 <WhatsAppIcon className="w-5 h-5" />
@@ -432,6 +438,7 @@ export default function App() {
             <a
               href={waHref}
               target="_blank"
+              onClick={() => trackClick('about')}
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center mt-8 rounded-full border-2 border-ink text-ink px-6 py-3 font-medium hover:bg-ink hover:text-sand transition-colors"
             >
@@ -774,6 +781,7 @@ export default function App() {
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
+                 onClick={() => trackClick('location')}
                 className="inline-flex items-center gap-2 rounded-full bg-lagoon text-sand px-5 py-3 text-sm font-medium hover:bg-lagoon-deep transition-colors"
               >
                 <WhatsAppIcon className="w-4 h-4" />
@@ -822,6 +830,7 @@ export default function App() {
             <p className="mt-3 text-ink-soft">{t.ctaBand.subtitle}</p>
             <a
               href={waHref}
+               onClick={() => trackClick('cta-band')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-8 rounded-full bg-mango text-ink px-7 py-4 font-medium hover:bg-mango-deep transition-colors"
@@ -871,6 +880,7 @@ export default function App() {
               <a
                 href={waHref}
                 target="_blank"
+                 onClick={() => trackClick('footer')}
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
                 className="hover:text-sand transition-colors"
@@ -917,6 +927,7 @@ export default function App() {
       <a
         href={waHref}
         target="_blank"
+         onClick={() => trackClick('floating-widget')}
         rel="noopener noreferrer"
         className="wa-button fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-50 flex items-center"
         aria-label={t.whatsapp.tooltip}
